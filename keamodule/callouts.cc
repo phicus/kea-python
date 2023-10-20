@@ -123,6 +123,40 @@ error:
     return (res);
 }
 
+static int
+call_unload_callout() {
+    PyObject *unload;
+    PyObject *py_result = 0;
+    int res = 1;
+
+    unload = PyObject_GetAttrString(hook_module, "unload");
+    if (!unload) {
+        PyErr_Clear();
+        return (0);
+    }
+    if (!PyCallable_Check(unload)) {
+        log_error("unload must be callable");
+        goto error;
+    }
+    py_result = PyObject_CallFunction(unload, NULL);
+    if (!py_result) {
+        log_python_traceback();
+        goto error;
+    }
+    if (!PyLong_CheckExact(py_result)) {
+        log_error("load unload return integer");
+        goto error;
+    }
+
+    res = PyLong_AsLong(py_result);
+
+error:
+    Py_XDECREF(py_result);
+    Py_XDECREF(unload);
+    return (res);
+}
+
+
 int
 Callouts_register(LibraryHandle *handle) {
     int res;
@@ -141,6 +175,9 @@ Callouts_register(LibraryHandle *handle) {
 
 int
 Callouts_unregister() {
+
+    call_unload_callout();
+
     return (unregister_callouts());
 }
 
