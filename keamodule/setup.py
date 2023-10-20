@@ -12,10 +12,10 @@ for line in open('../settings.mk'):
 
 def calc_macros():
     config_h = open(os.path.join(settings['KEA_INC'], 'config.h')).read()
-    m = re.search(r'^#define VERSION "([^"]*)"\n', config_h, re.M)
+    m = re.search(r'^#define VERSION "(\d+)\.(\d+)\.(\d+)[^"]*"\n', config_h, re.M)
     if not m:
         raise RuntimeError('could not determine kea version')
-    version = tuple(int(v) for v in m.group(1).split('.'))
+    version = tuple(map(int, m.groups()))
     macros = []
     if version < (1, 7, 1):
         macros.append(('MISSING_GETLEASES4_HOSTNAME', None))
