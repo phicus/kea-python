@@ -11,7 +11,8 @@ def find_pyinc():
 
 def find_keainc():
     for path in ['/usr/local/include/kea',
-                 '/usr/include/kea']:
+                 '/usr/include/kea',
+                 '/opt/kea/include/kea']:
         if os.path.isdir(path):
             return path
     raise RuntimeError('cannot find kea include')
@@ -19,7 +20,8 @@ def find_keainc():
 
 def find_keahooks():
     for path in ['/usr/local/lib/kea/hooks',
-                 '/usr/lib64/kea/hooks']:
+                 '/usr/lib64/kea/hooks',
+                 '/opt/kea/lib/kea/hooks']:
         if os.path.isdir(path):
             return path
     raise RuntimeError('cannot find kea hooks')
@@ -27,7 +29,8 @@ def find_keahooks():
 
 def find_kealibs():
     for path in ['/usr/local/lib',
-                 '/usr/lib64']:
+                 '/usr/lib64',
+                 '/opt/kea/lib']:
         if os.path.exists(os.path.join(path, 'libkea-hooks.so')):
             return path
     raise RuntimeError('cannot locate kea library directory')
