@@ -10,6 +10,7 @@
 #include <dhcpsrv/host_mgr.h>
 #include <dhcp/dhcp4.h>
 #include <dhcpsrv/parsers/host_reservation_parser.h>
+#include <dhcpsrv/lease_mgr_factory.h>
 
 extern "C" {
 
@@ -191,6 +192,7 @@ typedef struct {
 #define LeaseMgr_Check(op) (Py_TYPE(op) == &LeaseMgrType)
 extern PyTypeObject LeaseMgrType;
 extern int LeaseMgr_define();
+extern PyObject *Leases4_from_handle(isc::dhcp::Lease4CollectionPtr &ptr);
 
 // subnet4.cc
 typedef struct {

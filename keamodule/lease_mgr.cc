@@ -31,6 +31,12 @@ lease_list_from_collection(Lease4Collection &leases) {
     return (list);
 }
 
+PyObject *
+Leases4_from_handle(Lease4CollectionPtr &ptr) {
+    Lease4Collection leases = *ptr;
+    return (lease_list_from_collection(leases));
+}
+
 static PyObject *
 LeaseMgr_getLease4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
     static const char *kwlist[] = {"addr", "hwaddr", "client_id", "subnet_id", NULL};

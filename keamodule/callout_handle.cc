@@ -1,4 +1,5 @@
 #include "keamodule.h"
+#include <dhcpsrv/lease_mgr_factory.h>
 
 using namespace std;
 using namespace isc::hooks;
@@ -26,6 +27,19 @@ CalloutHandle_getArgument(CalloutHandleObject *self, PyObject *args) {
             return (0);
         }
     }
+
+    if (strcmp(name, "leases4") == 0) {
+        try {
+            Lease4CollectionPtr ptr;
+            self->handle->getArgument(name, ptr);
+            return (Leases4_from_handle(ptr));
+        }
+        catch (const exception &e) {
+            PyErr_SetString(PyExc_TypeError, e.what());
+            return (0);
+        }
+    }
+
 
     if (strcmp(name, "query4") == 0 || strcmp(name, "response4") == 0) {
         try {
