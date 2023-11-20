@@ -2,6 +2,8 @@ ifeq "$(VER)" ""
 	VER=2.0.2
 endif
 
+CONTAINER_RUNTIME ?= $(if $(shell command -v podman ;),podman,docker)
+
 help:
 	@echo "run on host"
 	@echo "  build-kea-dev   - build kea-dev:$(VER) image"
@@ -23,32 +25,32 @@ help:
 	@echo "  test-module     - run unit tests for kea extension module"
 
 build-kea-dev:
-	docker build --build-arg VER=$(VER) -f DockerfileDev --tag kea-dev:$(VER) .
+	$(CONTAINER_RUNTIME) build --build-arg VER=$(VER) -f DockerfileDev --tag kea-dev:$(VER) .
 
 build-kea:
-	docker build --build-arg VER=$(VER) --tag kea:$(VER) .
+	$(CONTAINER_RUNTIME) build --build-arg VER=$(VER) --tag kea:$(VER) .
 
 build-dhtest:
-	cd dhtest && docker build --tag dhtest .
+	cd dhtest && $(CONTAINER_RUNTIME) build --tag dhtest .
 
 run-kea-dev: kea-network
-	docker run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea-dev kea-dev:$(VER) bash
+	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea-dev kea-dev:$(VER) bash
 
 run-kea: kea-network
-	docker run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea kea:$(VER) bash
+	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea kea:$(VER) bash
 
 run-mysql: kea-network dhcpdb_create.mysql.sql
-	docker run --rm --network kea \
+	$(CONTAINER_RUNTIME) run --rm --network kea \
 		-e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=kea -e MYSQL_USER=kea -eMYSQL_PASSWORD=kea \
 		--name mysql \
 		-v `pwd`/dhcpdb_create.mysql.sql:/docker-entrypoint-initdb.d/dhcpdb_create.mysql.sql \
 		mariadb
 
 run-dhtest: kea-network
-	docker run --rm -it --network kea --privileged -v`pwd`:/workdir --name dhtest dhtest bash
+	$(CONTAINER_RUNTIME) run --rm -it --network kea --privileged -v`pwd`:/workdir --name dhtest dhtest bash
 
 kea-network:
-	docker network ls | grep -q kea || docker network create --subnet=172.28.5.0/24 --ip-range=172.28.5.0/24 kea
+	$(CONTAINER_RUNTIME) network ls | grep -q kea || $(CONTAINER_RUNTIME) network create --subnet=172.28.5.0/24 --ip-range=172.28.5.0/24 kea
 
 build: build-hook build-module
 
