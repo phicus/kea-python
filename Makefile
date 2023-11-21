@@ -1,7 +1,5 @@
-ifeq "$(VER)" ""
-	VER=2.0.2
-endif
 
+VER ?= 2.4.0
 CONTAINER_RUNTIME ?= $(if $(shell command -v podman ;),podman,docker)
 
 help:
