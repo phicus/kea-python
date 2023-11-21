@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/phicus/kea-dev:latest
+      credentials:
+         username: ghcr.io/phicus
+         password: ${{ secrets.REGISTRY_TOKEN }}
+      volumes:
+        - "${{github.workspace}}:/workdir"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Run Tests
+        run: cd /workdir && make test
