@@ -59,6 +59,6 @@ kea = Extension('kea',
                 extra_compile_args=['-std=c++11'])
 
 setup(name='kea',
-      version='1.0',
+      version='1.1',
       description='Extension module for Kea',
       ext_modules=[kea])
