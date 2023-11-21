@@ -84,8 +84,8 @@ dhcpdb_create.mysql.sql:
 	tar xz --strip-components 6 -f kea-$(VER).tar.gz kea-$(VER)/src/share/database/scripts/mysql/dhcpdb_create.mysql
 	mv dhcpdb_create.mysql dhcpdb_create.mysql.sql
 
-test-module:
-	PYTHONPATH=$(wildcard keamodule/build/lib.*) nosetests3 -w keamodule/tests
+test-module: build-module
+	PYTHONPATH=$(wildcard keamodule/build/lib.*) python3 -m pytest keamodule/tests
 
 .PHONY: help \
 	build-kea-dev build-kea build-dhtest run-kea-dev run-kea run-mysql run-dhtest kea-network \
