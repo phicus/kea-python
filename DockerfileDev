@@ -1,4 +1,7 @@
-FROM ubuntu:21.04
+# syntax=docker/dockerfile:1
+
+FROM debian:bullseye-slim AS build
+
 ARG VER
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -7,24 +10,17 @@ COPY kea-$VER.tar.gz .
 
 RUN apt-get update -y \
     && apt-get -y install --no-install-recommends \
-        procps \
-        make \
-        socat \
-        g++ \
-        gdb \
-        libffi-dev \
-        libboost-dev \
+        build-essential \
         libboost-system-dev \
-        libssl-dev \
+        libkrb5-dev \
         liblog4cplus-dev \
-        libpython3-dev \
-        python3 \
-        python3-distutils \
-        python3-nose \
-        libpq-dev \
-        postgresql-server-dev-all \
         libmariadb-dev \
         libmariadb-dev-compat \
+        libssl-dev=1.1.1* \
+        libpython3-dev \
+        postgresql-server-dev-all \
+        python3-pytest \
+        python3-setuptools \
     && tar xzf kea-$VER.tar.gz \
     && cd kea-$VER \
     && ./configure \
@@ -34,6 +30,8 @@ RUN apt-get update -y \
         --enable-generate-messages \
         --with-mysql=/usr/bin/mysql_config \
         --with-pgsql=/usr/bin/pg_config \
-    && make \
+    && make --silent --jobs=$(nproc) \
     && make install \
-    && ldconfig
+    && ldconfig \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /source
