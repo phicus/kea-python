@@ -12,13 +12,14 @@ extern "C" {
 static PyObject *
 HostMgr_add(HostMgrObject *self, PyObject *args) {
     HostObject *host;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
 
-    if (!PyArg_ParseTuple(args, "O!", &HostType, &host)) {
+    if (!PyArg_ParseTuple(args, "O!|i", &HostType, &host, &target)) {
         return (0);
     }
 
     try {
-        self->mgr->add(host->ptr);
+        self->mgr->add(host->ptr, target);
         Py_RETURN_NONE;
     }
     catch (const exception &e) {
@@ -33,15 +34,10 @@ HostMgr_get(HostMgrObject *self, PyObject *args) {
     const char *ip_address = 0;
     const char *identifier_type = 0;
     const char *identifier = 0;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
 
-    if (PyTuple_GET_SIZE(args) == 2) {
-        if (!PyArg_ParseTuple(args, "ks", &subnet_id, &ip_address)) {
-            return (0);
-        }
-    } else {
-        if (!PyArg_ParseTuple(args, "kss", &subnet_id, &identifier_type, &identifier)) {
-            return (0);
-        }
+    if (!PyArg_ParseTuple(args, "ks|si", &subnet_id, &identifier_type, &identifier, &target)) {
+        return (0);
     }
 
     try {
@@ -53,7 +49,7 @@ HostMgr_get(HostMgrObject *self, PyObject *args) {
             if (binary.empty()) {
                 str::decodeFormattedHexString(identifier, binary);
             }
-            host = self->mgr->get4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size());
+            host = self->mgr->get4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size(), target);
         }
         if (!host.get()) {
             Py_RETURN_NONE;
@@ -137,13 +133,14 @@ static PyObject *
 HostMgr_del_(HostMgrObject *self, PyObject *args) {
     unsigned long subnet_id;
     const char *ip_address;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
 
-    if (!PyArg_ParseTuple(args, "ks", &subnet_id, &ip_address)) {
+    if (!PyArg_ParseTuple(args, "ks|i", &subnet_id, &ip_address, &target)) {
         return (0);
     }
 
     try {
-        if (self->mgr->del(subnet_id, IOAddress(ip_address))) {
+        if (self->mgr->del(subnet_id, IOAddress(ip_address), target)) {
             Py_RETURN_TRUE;
         } else {
             Py_RETURN_FALSE;
@@ -160,8 +157,9 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
     unsigned long subnet_id;
     const char *identifier_type;
     const char *identifier;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
 
-    if (!PyArg_ParseTuple(args, "kss", &subnet_id, &identifier_type, &identifier)) {
+    if (!PyArg_ParseTuple(args, "kss|i", &subnet_id, &identifier_type, &identifier, &target)) {
         return (0);
     }
 
@@ -170,7 +168,7 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
         if (binary.empty()) {
             str::decodeFormattedHexString(identifier, binary);
         }
-        if (self->mgr->del4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size())) {
+        if (self->mgr->del4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size()), target) {
             Py_RETURN_TRUE;
         } else {
             Py_RETURN_FALSE;

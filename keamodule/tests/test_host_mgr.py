@@ -22,7 +22,10 @@ class TestHostMgr_add(utils.BaseTestCase):
 
     def test_badarg_count(self):
         m = kea.HostMgr.instance()
-        self.assert_method_one_arg_no_keywords(m.add)
+        with self.assertRaises(TypeError) as cm:
+            m.add(1)
+        with self.assertRaises(TypeError) as cm:
+            m.add(1, 2)
 
     def test_badarg_type(self):
         m = kea.HostMgr.instance()

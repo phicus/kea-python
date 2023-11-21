@@ -190,6 +190,12 @@ static KeaConstant constants[] = {
     {"IDENT_CIRCUIT_ID", Host::IdentifierType::IDENT_CIRCUIT_ID},
     {"IDENT_CLIENT_ID", Host::IdentifierType::IDENT_CLIENT_ID},
     {"IDENT_FLEX", Host::IdentifierType::IDENT_FLEX},
+
+    {"UNSPECIFIED_SOURCE", HostMgrOperationTarget::UNSPECIFIED_SOURCE},
+    {"PRIMARY_SOURCE", HostMgrOperationTarget::PRIMARY_SOURCE},
+    {"ALTERNATE_SOURCES", HostMgrOperationTarget::ALTERNATE_SOURCES},
+    {"ALL_SOURCES", HostMgrOperationTarget::ALL_SOURCES},
+
 };
 #define num_constants (sizeof(constants) / sizeof(constants[0]))
 
