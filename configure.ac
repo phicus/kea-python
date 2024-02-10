@@ -20,8 +20,7 @@ AC_PROG_CXX
 # This suppresses the error we get for also having the cc version of helper library.
 AC_SUBST([CC])
 
-defaultdirs="/ /usr /usr/local /usr/local/kea /usr/pkg /opt /opt/local"
-
+defaultdirs="/usr /usr/local /usr/local/kea /usr/pkg /opt /opt/local"
 
 AC_ARG_WITH([kea],
             [AS_HELP_STRING([--with-kea[[=PATH]]],
@@ -97,5 +96,6 @@ AC_CONFIG_FILES([keamodule/Makefile])
 
 # Finally produce "configure" script
 AC_OUTPUT
+
 
 echo "Configuration successful. Now type 'make' to compile the code."
