@@ -1,5 +1,13 @@
+ACLOCAL_AMFLAGS = -I m4macros ${ACLOCAL_FLAGS}
+# ^^^^^^^^ This has to be the first line and cannot come later in this
+# Makefile.am due to some bork in some versions of autotools.
 
-VER ?= 2.4.0
+# We don't want to follow GNU file setup (no README, no AUTHORS, etc)
+AUTOMAKE_OPTIONS = foreign
+# We have two dirs with code and (Makefile.am's) in them
+SUBDIRS = keahook keamodule
+
+VER ?= 2.4.1
 CONTAINER_RUNTIME ?= $(if $(shell command -v podman ;),podman,docker)
 
 help:
@@ -60,14 +68,6 @@ build-module: settings.mk
 
 clean-module:
 	cd keamodule && rm -rf build
-
-install: install-hook install-module
-
-install-hook: build-hook
-	cd keahook && make install
-
-install-module: build-module
-	cd keamodule && python3 setup.py install
 
 clean:
 	touch settings.mk
