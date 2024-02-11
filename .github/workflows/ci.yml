@@ -24,7 +24,7 @@ jobs:
 
       - name: Install
         working-directory: /workdir
-        run: ./autogen.sh && ./configure && make install
+        run: autoreconf --install --force && ./configure && make install
 
       - name: Run Python3 Tests
         working-directory: /workdir

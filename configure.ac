@@ -90,7 +90,7 @@ AC_CONFIG_FILES([keamodule/setup.py], [chmod +x keamodule/setup.py])
 # produce Makefiles from this list.
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([m4macros/Makefile])
+#AC_CONFIG_FILES([m4macros/Makefile])
 AC_CONFIG_FILES([keahook/Makefile])
 AC_CONFIG_FILES([keamodule/Makefile])
 
