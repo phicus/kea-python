@@ -4,7 +4,16 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.gcda
+*.gcno
+*.gcov
+*.la
+*.lo
 *.so
+*.o
+*~
+.deps/
+.libs/
 
 # Distribution / packaging
 .Python
@@ -159,11 +168,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-*.log.lock
-kea-*.tar.gz
-settings.mk
-dhcpdb_create.mysql.sql
-
 # http://www.gnu.org/software/automake
 
 Makefile.in
@@ -200,3 +204,10 @@ autom4te.cache
 # can automatically generate from config.status script
 # (which is called by configure script))
 Makefile
+
+# Project specific
+*.log.lock
+kea-*.tar.gz
+settings.mk
+dhcpdb_create.mysql.sql
+keamodule/setup.py
