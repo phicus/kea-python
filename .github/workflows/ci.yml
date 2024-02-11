@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/phicus/kea-dev:latest
+      image: ghcr.io/phicus/kea-python-dev:latest
       credentials:
          username: ghcr.io/phicus
          password: ${{ secrets.REGISTRY_TOKEN }}
@@ -22,5 +22,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run Tests
-        run: cd /workdir && make test
+      - name: Install
+        working-directory: /workdir
+        run: ./autogen.sh && ./configure && make install
+
+      - name: Run Python3 Tests
+        working-directory
+        run: python3 -m pytest ./keamodule
