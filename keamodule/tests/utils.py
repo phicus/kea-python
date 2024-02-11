@@ -57,12 +57,10 @@ class BaseTestCase(unittest.TestCase):
     def assert_method_no_arguments(self, method):
         with self.assertRaises(TypeError) as cm:
             method(1)
-        msg = '%s() takes no arguments (1 given)' % method.__qualname__
-        self.assertEqual((msg,), cm.exception.args)
+        self.assertEqual((f'{method.__name__}() takes no arguments (1 given)',), cm.exception.args)
         with self.assertRaises(TypeError) as cm:
             method(x=1)
-        msg = '%s() takes no keyword arguments' % method.__qualname__
-        self.assertEqual((msg,), cm.exception.args)
+        self.assertEqual((f'{method.__name__}() takes no keyword arguments',), cm.exception.args)
 
     def assert_method_one_arg_no_keywords(self, method):
         with self.assertRaises(TypeError) as cm:
