@@ -196,6 +196,8 @@ autom4te.cache
 /configure.scan
 /depcomp
 /install-sh
+/libtool
+/ltmain.sh
 /missing
 /stamp-h1
 
