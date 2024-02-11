@@ -4,7 +4,16 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.gcda
+*.gcno
+*.gcov
+*.la
+*.lo
 *.so
+*.o
+*~
+.deps/
+.libs/
 
 # Distribution / packaging
 .Python
@@ -159,7 +168,46 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# http://www.gnu.org/software/automake
+
+Makefile.in
+/ar-lib
+/mdate-sh
+/py-compile
+/test-driver
+/ylwrap
+.deps/
+.dirstamp
+
+# http://www.gnu.org/software/autoconf
+
+autom4te.cache
+/autoscan.log
+/autoscan-*.log
+/aclocal.m4
+/compile
+/config.cache
+/config.guess
+/config.h.in
+/config.log
+/config.status
+/config.sub
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+
+# Generated Makefile
+# (meta build system like autotools,
+# can automatically generate from config.status script
+# (which is called by configure script))
+Makefile
+
+# Project specific
 *.log.lock
 kea-*.tar.gz
 settings.mk
 dhcpdb_create.mysql.sql
+keamodule/setup.py
