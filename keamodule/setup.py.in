@@ -1,0 +1,51 @@
+import os
+import re
+from setuptools import setup, Extension
+
+def transform_includes_to_list(include_string):
+    return [e.replace('-I', '', 1) for e in include_string.split() if e.startswith('-I')]
+
+def transform_libs_to_list(lib_string):
+    return [e.replace('-L', '', 1) for e in lib_string.split() if e.startswith('-L')]
+
+def include_dirs():
+    return transform_includes_to_list('@KEA_INCLUDES@')
+
+def library_dirs():
+    return transform_libs_to_list('@KEA_LIBS@')
+
+kea = Extension('kea',
+    sources=['kea.cc',
+                'host.cc',
+                'host_reservation_parser4.cc',
+                'host_mgr.cc',
+                'cfg_mgr.cc',
+                'cfg_subnets4.cc',
+                'lease_mgr.cc',
+                'errors.cc',
+                'capsule.cc',
+                'constants.cc',
+                'utils.cc',
+                'callouts.cc',
+                'callout_closure.cc',
+                'callout_manager.cc',
+                'library_handle.cc',
+                'callout_handle.cc',
+                'lease4.cc',
+                'pkt4.cc',
+                'subnet4.cc',
+                'option.cc',
+                'srv_config.cc'],
+    include_dirs=include_dirs(),
+    library_dirs=library_dirs(),
+    libraries=['kea-exceptions',
+                'kea-log',
+                'kea-hooks',
+                'kea-dhcpsrv',
+                'ffi'],
+    extra_compile_args=['-std=c++11'])
+
+setup(name='kea',
+      version='@PACKAGE_VERSION@',
+      description='Extension module for Kea',
+      ext_modules=[kea])
