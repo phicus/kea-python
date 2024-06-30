@@ -1,5 +1,3 @@
-import textwrap
-import unittest
 from ipaddress import IPv4Network
 
 import kea
@@ -406,18 +404,14 @@ class TestPkt4_toText(utils.BaseTestCase):
     def test_badarg_count(self):
         self.assert_method_no_arguments(self.packet4.toText)
 
-    @unittest.skip
     def test_empty(self):
         assert (
-            textwrap.dedent(
-                "            local_address=0.0.0.0:67, remote_address=0.0.0.0:68, "
-                "msg_type=DHCPREQUEST (3), transid=0x2a,\n            options:\n"
-                "              type=053, len=001: 3 (uint8)"
-            )
-            == self.packet4.toText()
+            self.packet4.toText() == "local_address=0.0.0.0:67, remote_address=0.0.0.0:68,\n"
+            "msg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
+            "options:\n"
+            "  type=053, len=001: 3 (uint8)"
         )  # noqa: E501
 
-    @unittest.skip
     def test_filled(self):
         # 53
         self.packet4.setLocalAddr("1.2.3.4")
@@ -430,16 +424,14 @@ class TestPkt4_toText(utils.BaseTestCase):
         self.packet4.addOption(kea.Option(kea.DHO_DHCP_RENEWAL_TIME).setUint32(1800))  # 58
         self.packet4.addOption(kea.Option(kea.DHO_DHCP_REBINDING_TIME).setUint32(3600))  # 59
         assert (
-            textwrap.dedent(
-                "            local_address=1.2.3.4:67, remote_address=2.3.4.5:68,"
-                " msg_type=DHCPREQUEST (3), transid=0x2a,\n            options:\n"
-                "              type=001, len=004: ff:ff:f0:00"
-                "              type=003, len=004: 0a:00:00:01\n"
-                "              type=015, len=008: 74:65:73:74:2e:6f:72:67\n"
-                "              type=051, len=004: 00:00:1c:20\n"
-                "              type=053, len=001: 3 (uint8)\n"
-                "              type=058, len=004: 00:00:07:08\n"
-                "              type=059, len=004: 00:00:0e:10"
-            )
-            == self.packet4.toText()
+            self.packet4.toText() == "local_address=1.2.3.4:67, remote_address=2.3.4.5:68,\n"
+            "msg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
+            "options:\n"
+            "  type=001, len=004: ff:ff:f0:00\n"
+            "  type=003, len=004: 0a:00:00:01\n"
+            "  type=015, len=008: 74:65:73:74:2e:6f:72:67\n"
+            "  type=051, len=004: 00:00:1c:20\n"
+            "  type=053, len=001: 3 (uint8)\n"
+            "  type=058, len=004: 00:00:07:08\n"
+            "  type=059, len=004: 00:00:0e:10"
         )  # noqa: E501
