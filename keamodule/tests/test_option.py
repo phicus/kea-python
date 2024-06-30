@@ -10,7 +10,7 @@ class TestOption_new(utils.BaseTestCase):
         self.assert_constructor_one_arg_no_keywords(kea.Option)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             kea.Option("foo")
         # self.assertEqual(("an integer is required (got type str)",), cm.value.args)
 
@@ -102,7 +102,7 @@ class TestOption_setUint8(utils.BaseTestCase):
 
     def test_badarg_type(self):
         o = kea.Option(42)
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             o.setUint8("foo")
 
     def test_ok(self):
@@ -129,7 +129,7 @@ class TestOption_setUint16(utils.BaseTestCase):
 
     def test_badarg_type(self):
         o = kea.Option(42)
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             o.setUint16("foo")
         # self.assertEqual(("an integer is required (got type str)",), cm.value.args)
 
@@ -189,7 +189,7 @@ class TestOption_getOption(utils.BaseTestCase):
 
     def test_badarg_type(self):
         o = kea.Option(42)
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             o.getOption("foo")
 
     def test_ok(self):

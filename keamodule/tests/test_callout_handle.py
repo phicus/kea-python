@@ -211,7 +211,7 @@ class TestCalloutHandle_setStatus(utils.BaseTestCase):
         self.assert_method_one_arg_no_keywords(self.handle.setStatus)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             self.handle.setStatus("foo")
 
     def test_ok(self):

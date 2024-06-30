@@ -30,7 +30,7 @@ class TestPkt4_new(utils.BaseTestCase):
             kea.Pkt4(42)
         assert cm.value.args == ("argument 1 must be bytes, not int",)
         # 2 args - type, trans_id
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             kea.Pkt4("1", 42)
         with pytest.raises(TypeError) as cm:
             kea.Pkt4(1, "42")
@@ -59,7 +59,7 @@ class TestPkt4_setType(utils.BaseTestCase):
         self.assert_method_one_arg_no_keywords(self.packet4.setType)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             self.packet4.setType("foo")
 
     def test_ok(self):
@@ -86,7 +86,7 @@ class TestPkt4_setFlags(utils.BaseTestCase):
         self.assert_method_one_arg_no_keywords(self.packet4.setFlags)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             self.packet4.setFlags("foo")
 
     def test_ok(self):
@@ -319,7 +319,7 @@ class TestPkt4_delOption(utils.BaseTestCase):
         self.assert_method_one_arg_no_keywords(self.packet4.delOption)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             self.packet4.delOption("foo")
 
     def test_ok(self):
@@ -365,7 +365,7 @@ class TestPkt4_getOption(utils.BaseTestCase):
         self.assert_method_one_arg_no_keywords(self.packet4.getOption)
 
     def test_badarg_type(self):
-        with pytest.raises(TypeError, match="object cannot be interpreted as an integer"):
+        with pytest.raises(TypeError, match="an integer is required|object cannot be interpreted as an integer"):
             self.packet4.getOption("foo")
 
     def test_ok(self):
