@@ -48,4 +48,5 @@ kea = Extension('kea',
 setup(name='kea',
       version='@PACKAGE_VERSION@',
       description='Extension module for Kea',
-      ext_modules=[kea])
+      ext_modules=[kea],
+      package_data={"kea": ["py.typed", "kea.pyi"]})
