@@ -224,19 +224,13 @@ HostMgr_from_ptr(HostMgr *mgr) {
 
 static PyObject *
 HostMgr_instance(HostMgrObject *self, PyObject *args) {
-    try {
-        HostMgr &mgr = HostMgr::instance();
-        return (HostMgr_from_ptr(&mgr));
-    }
-    catch (const exception &e) {
-        PyErr_SetString(PyExc_TypeError, e.what());
-        return (0);
-    }
+    Py_INCREF(self);
+    return (PyObject *)self;
 }
 
 
 static PyMethodDef HostMgr_methods[] = {
-    {"instance", (PyCFunction) HostMgr_instance, METH_NOARGS|METH_STATIC,
+    {"instance", (PyCFunction) HostMgr_instance, METH_NOARGS,
      "Returns a sole instance of the HostMgr."},
     {"add", (PyCFunction) HostMgr_add, METH_VARARGS,
      "Adds a new host to the alternate data source."},
@@ -257,10 +251,42 @@ static PyMethodDef HostMgr_methods[] = {
     {0}  // Sentinel
 };
 
-static int
-HostMgr_init(HostMgrObject *self, PyObject *args, PyObject *kwds) {
-    PyErr_SetString(PyExc_RuntimeError, "cannot directly construct");
-    return (-1);
+// static int
+// HostMgr_init(HostMgrObject *self, PyObject *args, PyObject *kwds) {
+//     PyErr_SetString(PyExc_RuntimeError, "cannot directly construct");
+//     return (-1);
+// }
+
+static PyObject *
+HostMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+    static HostMgrObject *instance = NULL;
+    static char *kwlist[] = {NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "", kwlist)) {
+        PyErr_SetString(PyExc_TypeError, "kea.HostMgr() takes no arguments");
+        return NULL;
+    }
+
+    if (instance == NULL) {
+        instance = (HostMgrObject *)type->tp_alloc(type, 0);
+        if (instance == NULL) {
+            return PyErr_NoMemory();
+        }
+
+        try {
+            instance->mgr = &HostMgr::instance();
+        } catch (const std::exception &e) {
+            Py_DECREF(instance);
+            instance = NULL;
+            PyErr_SetString(PyExc_RuntimeError, e.what());
+            return NULL;
+        }
+
+        // Py_INCREF(instance);
+    }
+
+    Py_INCREF(instance);
+    return (PyObject *)instance;
 }
 
 PyTypeObject HostMgrType = {
@@ -299,9 +325,9 @@ PyTypeObject HostMgrType = {
     0,                                          // tp_descr_get
     0,                                          // tp_descr_set
     0,                                          // tp_dictoffset
-    (initproc) HostMgr_init,                    // tp_init
+    0,                                          // tp_init
     PyType_GenericAlloc,                        // tp_alloc
-    PyType_GenericNew                           // tp_new
+    HostMgr_new                                 // tp_new
 };
 
 int

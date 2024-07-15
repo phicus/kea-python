@@ -1,4 +1,5 @@
 #include "keamodule.h"
+#include <process/daemon.h>
 
 using namespace std;
 
@@ -6,8 +7,22 @@ extern "C" {
 
 PyObject *kea_module;
 
+static PyObject *
+kea__loggerInit(PyObject *self, PyObject *args) {
+    char *logger_name;
+
+    if (!PyArg_ParseTuple(args, "s", &logger_name)) {
+        return NULL;
+    }
+
+    isc::process::Daemon::setDefaultLoggerName(logger_name);
+    isc::process::Daemon::loggerInit(logger_name, true);
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef kea_methods[] = {
-    {0, 0, 0, 0}   // sentinel
+    {"_loggerInit", (PyCFunction)kea__loggerInit, METH_VARARGS, "Init logger for test propouses."},
+    {NULL, NULL, 0, NULL}  // Sentinel
 };
 
 static PyModuleDef kea_module_def = {
