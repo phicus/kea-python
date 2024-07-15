@@ -29,36 +29,68 @@ HostMgr_add(HostMgrObject *self, PyObject *args) {
 }
 
 static PyObject *
-HostMgr_get(HostMgrObject *self, PyObject *args) {
+HostMgr_get4(HostMgrObject *self, PyObject *args) {
     unsigned long subnet_id;
     const char *ip_address = 0;
-    const char *identifier_type = 0;
-    const char *identifier = 0;
-    HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALL_SOURCES;
 
-    if (!PyArg_ParseTuple(args, "ks|si", &subnet_id, &identifier_type, &identifier, &target)) {
-        return (0);
+    if (!PyArg_ParseTuple(args, "ks|i", &subnet_id, &ip_address, &target)) {
+        return NULL;
     }
 
     try {
         ConstHostPtr host;
-        if (ip_address != 0) {
-            host = self->mgr->get4(subnet_id, IOAddress(ip_address));
-        } else {
-            std::vector<uint8_t> binary = str::quotedStringToBinary(identifier);
-            if (binary.empty()) {
-                str::decodeFormattedHexString(identifier, binary);
-            }
-            host = self->mgr->get4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size(), target);
-        }
+        host = self->mgr->get4(subnet_id, IOAddress(ip_address), target);
         if (!host.get()) {
             Py_RETURN_NONE;
         }
         return Host_from_constptr(host);
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
+    }
+}
+
+static PyObject *
+HostMgr_get4Any(HostMgrObject *self, PyObject *args) {
+    unsigned long subnet_id;
+    const char *identifier_type = 0;
+    const char *identifier = 0;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALL_SOURCES;
+
+    if (!PyArg_ParseTuple(
+            args, "kss|i", &subnet_id, &identifier_type, &identifier, &target)) {
+        return NULL;
+    }
+
+    try {
+        ConstHostPtr host;
+        std::vector<uint8_t> binary = str::quotedStringToBinary(identifier);
+        if (binary.empty()) {
+            str::decodeFormattedHexString(identifier, binary);
+        }
+        host = self->mgr->get4Any(
+            subnet_id,
+            Host::getIdentifierType(identifier_type),
+            &binary.front(),
+            binary.size(),
+            target);
+        if (!host.get()) {
+            Py_RETURN_NONE;
+        }
+        return Host_from_constptr(host);
+    } catch (const exception &e) {
+        PyErr_SetString(PyExc_TypeError, e.what());
+        return (0);
+    }
+}
+
+static PyObject *
+HostMgr_get(HostMgrObject *self, PyObject *args) {
+    if (PyTuple_Size(args) >= 3 && PyUnicode_Check(PyTuple_GetItem(args, 2))) {
+        return HostMgr_get4Any(self, args);
+    } else {
+        return HostMgr_get4(self, args);
     }
 }
 
@@ -86,18 +118,19 @@ collection_to_list(ConstHostCollection& hosts) {
 static PyObject *
 HostMgr_getAll4(HostMgrObject *self, PyObject *args) {
     unsigned long subnet_id;
+    HostMgrOperationTarget target = HostMgrOperationTarget::ALL_SOURCES;
 
-    if (!PyArg_ParseTuple(args, "k", &subnet_id)) {
-        return (0);
+    if (!PyArg_ParseTuple(args, "k|i", &subnet_id, &target)) {
+        return NULL;
     }
 
     try {
-        ConstHostCollection hosts = self->mgr->getAll4(subnet_id);
+        ConstHostCollection hosts = self->mgr->getAll4(subnet_id, target);
         return (collection_to_list(hosts));
     }
     catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
-        return (0);
+        return NULL;
     }
 }
 
@@ -109,7 +142,7 @@ HostMgr_getPage4(HostMgrObject *self, PyObject *args) {
     unsigned long page_size = 0;
 
     if (!PyArg_ParseTuple(args, "kkKk", &subnet_id, &source_index, &lower_host_id, &page_size)) {
-        return (0);
+        return NULL;
     }
 
     try {
@@ -160,7 +193,7 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
     HostMgrOperationTarget target = HostMgrOperationTarget::ALTERNATE_SOURCES;
 
     if (!PyArg_ParseTuple(args, "kss|i", &subnet_id, &identifier_type, &identifier, &target)) {
-        return (0);
+        return NULL;
     }
 
     try {
@@ -168,7 +201,7 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
         if (binary.empty()) {
             str::decodeFormattedHexString(identifier, binary);
         }
-        if (self->mgr->del4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size()), target) {
+        if (self->mgr->del4(subnet_id, Host::getIdentifierType(identifier_type), &binary.front(), binary.size(), target)) {
             Py_RETURN_TRUE;
         } else {
             Py_RETURN_FALSE;
@@ -176,7 +209,7 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
     }
     catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
-        return (0);
+        return NULL;
     }
 }
 
@@ -209,7 +242,11 @@ static PyMethodDef HostMgr_methods[] = {
      "Adds a new host to the alternate data source."},
     {"get", (PyCFunction) HostMgr_get, METH_VARARGS,
      "Returns a host connected to the IPv4 subnet."},
-    {"getAll4", (PyCFunction) HostMgr_getAll4, METH_VARARGS,
+    {"get4", (PyCFunction) HostMgr_get4, METH_VARARGS,
+     "Returns a host connected to the IPv4 subnet by address."},
+    {"get4Any", (PyCFunction) HostMgr_get, METH_VARARGS,
+     "Returns a host connected to the IPv4 subnet by (subnet4-id, identifier)."},
+    {"getAll4", (PyCFunction) HostMgr_get4Any, METH_VARARGS,
      "Return all hosts in a DHCPv4 subnet."},
     {"getPage4", (PyCFunction) HostMgr_getPage4, METH_VARARGS,
      "Returns range of hosts in a DHCPv4 subnet."},
