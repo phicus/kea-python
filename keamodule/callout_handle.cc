@@ -1,5 +1,6 @@
-#include "keamodule.h"
 #include <dhcpsrv/lease_mgr_factory.h>
+
+#include "keamodule.h"
 
 using namespace std;
 using namespace isc::hooks;
@@ -21,8 +22,7 @@ CalloutHandle_getArgument(CalloutHandleObject *self, PyObject *args) {
             Lease4Ptr ptr;
             self->handle->getArgument(name, ptr);
             return (Lease4_from_handle(ptr));
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -33,21 +33,18 @@ CalloutHandle_getArgument(CalloutHandleObject *self, PyObject *args) {
             Lease4CollectionPtr ptr;
             self->handle->getArgument(name, ptr);
             return (Leases4_from_handle(ptr));
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
     }
-
 
     if (strcmp(name, "query4") == 0 || strcmp(name, "response4") == 0) {
         try {
             Pkt4Ptr ptr;
             self->handle->getArgument(name, ptr);
             return (Pkt4_from_handle(ptr));
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -58,8 +55,7 @@ CalloutHandle_getArgument(CalloutHandleObject *self, PyObject *args) {
             ConstElementPtr ptr;
             self->handle->getArgument(name, ptr);
             return (element_to_object(ptr));
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -86,8 +82,7 @@ CalloutHandle_setArgument(CalloutHandleObject *self, PyObject *args) {
         try {
             self->handle->setArgument(name, ((Lease4Object *)value)->ptr);
             Py_RETURN_NONE;
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -101,8 +96,7 @@ CalloutHandle_setArgument(CalloutHandleObject *self, PyObject *args) {
         try {
             self->handle->setArgument(name, ((Pkt4Object *)value)->ptr);
             Py_RETURN_NONE;
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -116,8 +110,7 @@ CalloutHandle_setArgument(CalloutHandleObject *self, PyObject *args) {
             }
             self->handle->setArgument(name, ptr);
             Py_RETURN_NONE;
-        }
-        catch (const exception &e) {
+        } catch (const exception &e) {
             PyErr_SetString(PyExc_TypeError, e.what());
             return (0);
         }
@@ -127,9 +120,8 @@ CalloutHandle_setArgument(CalloutHandleObject *self, PyObject *args) {
     return (0);
 }
 
-
-ObjectHolder::ObjectHolder(PyObject *obj): obj_(obj) {
-     Py_INCREF(obj);
+ObjectHolder::ObjectHolder(PyObject *obj) : obj_(obj) {
+    Py_INCREF(obj);
 }
 
 ObjectHolder::~ObjectHolder() {
@@ -154,8 +146,7 @@ CalloutHandle_setContext(CalloutHandleObject *self, PyObject *args) {
     try {
         self->handle->setContext(name, ObjectHolderPtr(new ObjectHolder(value)));
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -174,8 +165,7 @@ CalloutHandle_getContext(CalloutHandleObject *self, PyObject *args) {
         self->handle->getContext(name, ptr);
         Py_INCREF(ptr->obj_);
         return (ptr->obj_);
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -192,8 +182,7 @@ CalloutHandle_deleteContext(CalloutHandleObject *self, PyObject *args) {
     try {
         self->handle->deleteContext(name);
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -203,8 +192,7 @@ static PyObject *
 CalloutHandle_getStatus(CalloutHandleObject *self, PyObject *args) {
     try {
         return PyLong_FromLong(self->handle->getStatus());
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -221,27 +209,26 @@ CalloutHandle_setStatus(CalloutHandleObject *self, PyObject *args) {
     try {
         self->handle->setStatus(CalloutHandle::CalloutNextStep(status));
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
 }
 
 static PyMethodDef CalloutHandle_methods[] = {
-    {"getArgument", (PyCFunction) CalloutHandle_getArgument, METH_VARARGS,
+    {"getArgument", (PyCFunction)CalloutHandle_getArgument, METH_VARARGS,
      "Gets the value of an argument."},
-    {"setArgument", (PyCFunction) CalloutHandle_setArgument, METH_VARARGS,
+    {"setArgument", (PyCFunction)CalloutHandle_setArgument, METH_VARARGS,
      "Sets the value of an argument."},
-    {"setContext", (PyCFunction) CalloutHandle_setContext, METH_VARARGS,
+    {"setContext", (PyCFunction)CalloutHandle_setContext, METH_VARARGS,
      "Sets an element in the context associated with the current library."},
-    {"getContext", (PyCFunction) CalloutHandle_getContext, METH_VARARGS,
+    {"getContext", (PyCFunction)CalloutHandle_getContext, METH_VARARGS,
      "Gets an element from the context associated with the current library."},
-    {"deleteContext", (PyCFunction) CalloutHandle_deleteContext, METH_VARARGS,
+    {"deleteContext", (PyCFunction)CalloutHandle_deleteContext, METH_VARARGS,
      "Deletes an item of the given name from the context associated with the current library. If an item of that name does not exist, the method is a no-op."},
-    {"getStatus", (PyCFunction) CalloutHandle_getStatus, METH_NOARGS,
+    {"getStatus", (PyCFunction)CalloutHandle_getStatus, METH_NOARGS,
      "Gets the next processing step."},
-    {"setStatus", (PyCFunction) CalloutHandle_setStatus, METH_VARARGS,
+    {"setStatus", (PyCFunction)CalloutHandle_setStatus, METH_VARARGS,
      "Sets the next processing step."},
     {0}  // Sentinel
 };
@@ -251,7 +238,7 @@ CalloutHandle_dealloc(CalloutHandleObject *self) {
     if (self->is_owner) {
         delete self->handle;
     }
-    Py_TYPE(self)->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int
@@ -269,8 +256,7 @@ CalloutHandle_init(CalloutHandleObject *self, PyObject *args, PyObject *kwds) {
     try {
         self->handle = new CalloutHandle(((CalloutManagerObject *)manager)->manager);
         self->is_owner = true;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (-1);
     }
@@ -281,20 +267,19 @@ CalloutHandle_init(CalloutHandleObject *self, PyObject *args, PyObject *kwds) {
 static PyObject *
 CalloutHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     CalloutHandleObject *self;
-    self = (CalloutHandleObject *) type->tp_alloc(type, 0);
+    self = (CalloutHandleObject *)type->tp_alloc(type, 0);
     if (self) {
         self->handle = 0;
         self->is_owner = false;
     }
-    return ((PyObject *) self);
+    return ((PyObject *)self);
 }
 
 PyTypeObject CalloutHandleType = {
-    PyObject_HEAD_INIT(0)
-    "kea.CalloutHandle",                        // tp_name
+    PyObject_HEAD_INIT(0) "kea.CalloutHandle",  // tp_name
     sizeof(CalloutHandleObject),                // tp_basicsize
     0,                                          // tp_itemsize
-    (destructor) CalloutHandle_dealloc,         // tp_dealloc
+    (destructor)CalloutHandle_dealloc,          // tp_dealloc
     0,                                          // tp_vectorcall_offset
     0,                                          // tp_getattr
     0,                                          // tp_setattr
@@ -325,7 +310,7 @@ PyTypeObject CalloutHandleType = {
     0,                                          // tp_descr_get
     0,                                          // tp_descr_set
     0,                                          // tp_dictoffset
-    (initproc) CalloutHandle_init,              // tp_init
+    (initproc)CalloutHandle_init,               // tp_init
     PyType_GenericAlloc,                        // tp_alloc
     CalloutHandle_new                           // tp_new
 };
@@ -341,17 +326,17 @@ CalloutHandle_from_handle(CalloutHandle *handle) {
 }
 
 int
-CalloutHandle_define() {
+CalloutHandle_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&CalloutHandleType) < 0) {
-        return (1);
+        return -1;
     }
     Py_INCREF(&CalloutHandleType);
-    if (PyModule_AddObject(kea_module, "CalloutHandle", (PyObject *) &CalloutHandleType) < 0) {
+    if (PyModule_AddObject(
+            kea_module, "CalloutHandle", (PyObject *)&CalloutHandleType) < 0) {
         Py_DECREF(&CalloutHandleType);
-        return (1);
+        return -1;
     }
 
-    return (0);
+    return 0;
 }
-
 }

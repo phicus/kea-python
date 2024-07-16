@@ -295,16 +295,15 @@ PyTypeObject HostMgrType = { // clang-format off
 };  // clang-format on
 
 int
-HostMgr_define() {
+HostMgr_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&HostMgrType) < 0) {
-        return (1);
+        return -1;
     }
     Py_INCREF(&HostMgrType);
-    if (PyModule_AddObject(kea_module, "HostMgr", (PyObject *)&HostMgrType) < 0) {
+    if (PyModule_AddObject(mod, name, (PyObject *)&HostMgrType) < 0) {
         Py_DECREF(&HostMgrType);
-        return (1);
+        return -1;
     }
-
-    return (0);
+    return 0;
 }
 }
