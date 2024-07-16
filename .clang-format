@@ -1,0 +1,8 @@
+# PEP 7
+BasedOnStyle: Google
+AlwaysBreakAfterReturnType: All
+ColumnLimit: 0
+IndentWidth: 4
+Language: Cpp
+PointerAlignment: Right
+SpaceAfterCStyleCast: false
