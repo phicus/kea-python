@@ -21,8 +21,7 @@ HostMgr_add(HostMgrObject *self, PyObject *args) {
     try {
         self->mgr->add(host->ptr, target);
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -95,7 +94,7 @@ HostMgr_get(HostMgrObject *self, PyObject *args) {
 }
 
 static PyObject *
-collection_to_list(ConstHostCollection& hosts) {
+collection_to_list(ConstHostCollection &hosts) {
     PyObject *result = PyList_New(hosts.size());
     if (result == 0) {
         return 0;
@@ -127,8 +126,7 @@ HostMgr_getAll4(HostMgrObject *self, PyObject *args) {
     try {
         ConstHostCollection hosts = self->mgr->getAll4(subnet_id, target);
         return (collection_to_list(hosts));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return NULL;
     }
@@ -155,8 +153,7 @@ HostMgr_getPage4(HostMgrObject *self, PyObject *args) {
         PyObject *result = Py_BuildValue("Ok", host_list, source_index);
         Py_DECREF(host_list);
         return (result);
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -178,8 +175,7 @@ HostMgr_del_(HostMgrObject *self, PyObject *args) {
         } else {
             Py_RETURN_FALSE;
         }
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -206,8 +202,7 @@ HostMgr_del4(HostMgrObject *self, PyObject *args) {
         } else {
             Py_RETURN_FALSE;
         }
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return NULL;
     }
@@ -228,8 +223,8 @@ HostMgr_instance(HostMgrObject *self, PyObject *args) {
     return (PyObject *)self;
 }
 
-
 static PyMethodDef HostMgr_methods[] = {
+    // clang-format off
     {"instance", (PyCFunction) HostMgr_instance, METH_NOARGS,
      "Returns a sole instance of the HostMgr."},
     {"add", (PyCFunction) HostMgr_add, METH_VARARGS,
@@ -248,14 +243,13 @@ static PyMethodDef HostMgr_methods[] = {
      "Attempts to delete a host by address."},
     {"del4", (PyCFunction) HostMgr_del4, METH_VARARGS,
      "Attempts to delete a host by (subnet4-id, identifier, identifier-type)."},
-    {0}  // Sentinel
-};
+    {NULL, NULL, 0, NULL}  // Sentinel
+}; // clang-format off
 
-// static int
-// HostMgr_init(HostMgrObject *self, PyObject *args, PyObject *kwds) {
-//     PyErr_SetString(PyExc_RuntimeError, "cannot directly construct");
-//     return (-1);
-// }
+static void
+HostMgr_dealloc(HostMgrObject *self) {
+    Py_TYPE(self)->tp_free((PyObject *)self);
+}
 
 static PyObject *
 HostMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
@@ -289,46 +283,16 @@ HostMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)instance;
 }
 
-PyTypeObject HostMgrType = {
-    PyObject_HEAD_INIT(0)
-    "kea.HostMgr",                              // tp_name
-    sizeof(HostMgrObject),                      // tp_basicsize
-    0,                                          // tp_itemsize
-    0,                                          // tp_dealloc
-    0,                                          // tp_vectorcall_offset
-    0,                                          // tp_getattr
-    0,                                          // tp_setattr
-    0,                                          // tp_as_async
-    0,                                          // tp_repr
-    0,                                          // tp_as_number
-    0,                                          // tp_as_sequence
-    0,                                          // tp_as_mapping
-    0,                                          // tp_hash
-    0,                                          // tp_call
-    0,                                          // tp_str
-    0,                                          // tp_getattro
-    0,                                          // tp_setattro
-    0,                                          // tp_as_buffer
-    Py_TPFLAGS_DEFAULT,                         // tp_flags
-    "Kea server HostMgr",                       // tp_doc
-    0,                                          // tp_traverse
-    0,                                          // tp_clear
-    0,                                          // tp_richcompare
-    0,                                          // tp_weaklistoffset
-    0,                                          // tp_iter
-    0,                                          // tp_iternext
-    HostMgr_methods,                            // tp_methods
-    0,                                          // tp_members
-    0,                                          // tp_getset
-    0,                                          // tp_base
-    0,                                          // tp_dict
-    0,                                          // tp_descr_get
-    0,                                          // tp_descr_set
-    0,                                          // tp_dictoffset
-    0,                                          // tp_init
-    PyType_GenericAlloc,                        // tp_alloc
-    HostMgr_new                                 // tp_new
-};
+PyTypeObject HostMgrType = { // clang-format off
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "kea.HostMgr",
+    .tp_basicsize = sizeof(HostMgrObject),
+    .tp_dealloc = (destructor) HostMgr_dealloc,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_doc = PyDoc_STR("Kea HostMgr singleton object"),
+    .tp_methods = HostMgr_methods,
+    .tp_new = HostMgr_new
+};  // clang-format on
 
 int
 HostMgr_define() {
@@ -336,12 +300,11 @@ HostMgr_define() {
         return (1);
     }
     Py_INCREF(&HostMgrType);
-    if (PyModule_AddObject(kea_module, "HostMgr", (PyObject *) &HostMgrType) < 0) {
+    if (PyModule_AddObject(kea_module, "HostMgr", (PyObject *)&HostMgrType) < 0) {
         Py_DECREF(&HostMgrType);
         return (1);
     }
 
     return (0);
 }
-
 }
