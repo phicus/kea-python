@@ -27,6 +27,7 @@ def test_HostMgr_instance(host_mgr):
     """Test to ensure that instance method returns the same instance."""
     assert host_mgr is kea.HostMgr.instance(), "Instance method does not return the same instance"
 
+
 @pytest.mark.parametrize(("args", "kwargs"), [((42,), {}), ((), {"foo": 42})])
 def test_HostMgr_new_no_arguments(args, kwargs):
     """Test to ensure that HostMgr raises TypeError with incorrect arguments."""

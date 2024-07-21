@@ -182,6 +182,7 @@ Option_registerType(PyObject *mod, const char *name);
 // cfg_mgr.cc
 typedef struct {
     PyObject_HEAD
+        isc::dhcp::CfgMgr *cfg_mgr;
 } CfgMgrObject;
 
 #define CfgMgr_Check(op) (Py_TYPE(op) == &CfgMgrType)
