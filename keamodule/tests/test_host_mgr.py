@@ -5,24 +5,27 @@ import pytest
 @pytest.fixture()
 def host_mgr():
     """Fixture to create a single instance of HostMgr."""
-    return kea.HostMgr()
+    return kea.HostMgr.instance()
 
 
 def test_HostMgr_instance_type(host_mgr):
-    """Test to check if the instance is of type kea.HostMgr."""
-    assert isinstance(host_mgr, kea.HostMgr)
+    """Test to check if the kea.HostMgr.instance() is of type kea.HostMgr."""
+    assert isinstance(host_mgr, kea.HostMgr), "The instance is not of type kea.HostMgr"
 
 
 def test_HostMgr_singleton(host_mgr):
     """Test to ensure that HostMgr follows singleton pattern."""
-    another_instance = kea.HostMgr()
-    assert host_mgr is another_instance
+    instance1 = kea.HostMgr()
+    instance2 = kea.HostMgr.instance()
+
+    assert host_mgr is instance1, "HostMgr is not a singleton"
+    assert host_mgr is instance2, "HostMgr.instance() is not a singleton"
+    assert instance1 is instance2, "HostMgr and HostMgr.instance() are not the same"
 
 
 def test_HostMgr_instance(host_mgr):
     """Test to ensure that instance method returns the same instance."""
-    assert host_mgr is host_mgr.instance()
-
+    assert host_mgr is kea.HostMgr.instance(), "Instance method does not return the same instance"
 
 @pytest.mark.parametrize(("args", "kwargs"), [((42,), {}), ((), {"foo": 42})])
 def test_HostMgr_new_no_arguments(args, kwargs):

@@ -219,13 +219,36 @@ HostMgr_from_ptr(HostMgr *mgr) {
 
 static PyObject *
 HostMgr_instance(HostMgrObject *self, PyObject *args) {
-    Py_INCREF(self);
-    return (PyObject *)self;
+    static HostMgrObject *instance = NULL;
+
+    // if (!PyArg_ParseTuple(args, "")) {
+    //     PyErr_SetString(PyExc_TypeError, "HostMgr.instance() takes no arguments");
+    //     return NULL;
+    // }
+
+    if (instance == NULL) {
+        // instance = (HostMgrObject *) PyObject_New(HostMgrObject, &HostMgrType);
+        instance = (HostMgrObject *)HostMgrType.tp_alloc(&HostMgrType, 0);
+        if (instance == NULL) {
+            return PyErr_NoMemory();
+        }
+        try {
+            instance->mgr = &HostMgr::instance();
+        } catch (const std::exception &e) {
+            Py_DECREF(instance);
+            instance = NULL;
+            PyErr_SetString(PyExc_RuntimeError, e.what());
+            return NULL;
+        }
+    }
+
+    Py_INCREF(instance);
+    return (PyObject *)instance;
 }
 
 static PyMethodDef HostMgr_methods[] = {
     // clang-format off
-    {"instance", (PyCFunction) HostMgr_instance, METH_NOARGS,
+    {"instance", (PyCFunction) HostMgr_instance, METH_NOARGS | METH_STATIC,
      "Returns a sole instance of the HostMgr."},
     {"add", (PyCFunction) HostMgr_add, METH_VARARGS,
      "Adds a new host to the alternate data source."},
@@ -262,25 +285,11 @@ HostMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     }
 
     if (instance == NULL) {
-        instance = (HostMgrObject *)type->tp_alloc(type, 0);
-        if (instance == NULL) {
-            return PyErr_NoMemory();
-        }
-
-        try {
-            instance->mgr = &HostMgr::instance();
-        } catch (const std::exception &e) {
-            Py_DECREF(instance);
-            instance = NULL;
-            PyErr_SetString(PyExc_RuntimeError, e.what());
-            return NULL;
-        }
-
-        // Py_INCREF(instance);
+        instance = (HostMgrObject *) HostMgr_instance(instance, args);
     }
 
     Py_INCREF(instance);
-    return (PyObject *)instance;
+    return (PyObject *) instance;
 }
 
 PyTypeObject HostMgrType = { // clang-format off
