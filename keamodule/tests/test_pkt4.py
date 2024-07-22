@@ -3,6 +3,9 @@ from ipaddress import IPv4Network
 import kea
 import pytest
 import utils
+from utils import check_kea_version as keaver
+
+NL = "\n"
 
 
 # https://fossies.org/dox/kea-1.7.4/classisc_1_1dhcp_1_1Pkt4.html
@@ -404,34 +407,49 @@ class TestPkt4_toText(utils.BaseTestCase):
     def test_badarg_count(self):
         self.assert_method_no_arguments(self.packet4.toText)
 
-    def test_empty(self):
-        assert (
-            self.packet4.toText() == "local_address=0.0.0.0:67, remote_address=0.0.0.0:68,\n"
-            "msg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
-            "options:\n"
-            "  type=053, len=001: 3 (uint8)"
-        )  # noqa: E501
 
-    def test_filled(self):
-        # 53
-        self.packet4.setLocalAddr("1.2.3.4")
-        self.packet4.setRemoteAddr("2.3.4.5")
-        subnet = IPv4Network("10.0.0.0/20")
-        self.packet4.addOption(kea.Option(kea.DHO_SUBNET_MASK).setBytes(subnet.netmask.packed))  # 1
-        self.packet4.addOption(kea.Option(kea.DHO_ROUTERS).setBytes(subnet[1].packed))  # 3
-        self.packet4.addOption(kea.Option(kea.DHO_DOMAIN_NAME).setString("test.org"))  # 15
-        self.packet4.addOption(kea.Option(kea.DHO_DHCP_LEASE_TIME).setUint32(7200))  # 51
-        self.packet4.addOption(kea.Option(kea.DHO_DHCP_RENEWAL_TIME).setUint32(1800))  # 58
-        self.packet4.addOption(kea.Option(kea.DHO_DHCP_REBINDING_TIME).setUint32(3600))  # 59
-        assert (
-            self.packet4.toText() == "local_address=1.2.3.4:67, remote_address=2.3.4.5:68,\n"
-            "msg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
-            "options:\n"
-            "  type=001, len=004: ff:ff:f0:00\n"
-            "  type=003, len=004: 0a:00:00:01\n"
-            "  type=015, len=008: 74:65:73:74:2e:6f:72:67\n"
-            "  type=051, len=004: 00:00:1c:20\n"
-            "  type=053, len=001: 3 (uint8)\n"
-            "  type=058, len=004: 00:00:07:08\n"
-            "  type=059, len=004: 00:00:0e:10"
-        )  # noqa: E501
+def test_Pkt4_toText_empty():
+    """Test to ensure that toText returns the correct string for an empty packet."""
+    packet4 = kea.Pkt4(kea.DHCPREQUEST, 42)
+    assert (
+        packet4.toText()
+        == "local_address=0.0.0.0:67, remote_address=0.0.0.0:68,"
+        + (
+            "\nmsg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
+            if keaver(">=2.6.0")
+            else " msg_type=DHCPREQUEST (3), transid=0x2a,\n"
+        )
+        + "options:\n"
+        "  type=053, len=001: 3 (uint8)"
+    )  # noqa: E501
+
+
+def test_Pkt4_toText_filled():
+    """Test to ensure that toText returns the correct string for a filled packet."""
+    packet4 = kea.Pkt4(kea.DHCPREQUEST, 42)
+    packet4.setLocalAddr("1.2.3.4")
+    packet4.setRemoteAddr("2.3.4.5")
+    subnet = IPv4Network("10.0.0.0/20")
+    packet4.addOption(kea.Option(kea.DHO_SUBNET_MASK).setBytes(subnet.netmask.packed))  # 1
+    packet4.addOption(kea.Option(kea.DHO_ROUTERS).setBytes(subnet[1].packed))  # 3
+    packet4.addOption(kea.Option(kea.DHO_DOMAIN_NAME).setString("test.org"))  # 15
+    packet4.addOption(kea.Option(kea.DHO_DHCP_LEASE_TIME).setUint32(7200))  # 51
+    packet4.addOption(kea.Option(kea.DHO_DHCP_RENEWAL_TIME).setUint32(1800))  # 58
+    packet4.addOption(kea.Option(kea.DHO_DHCP_REBINDING_TIME).setUint32(3600))  # 59
+    assert (
+        packet4.toText()
+        == "local_address=1.2.3.4:67, remote_address=2.3.4.5:68,"
+        + (
+            "\nmsg_type=DHCPREQUEST (3), trans_id=0x2a,\n"
+            if keaver(">=2.6.0")
+            else " msg_type=DHCPREQUEST (3), transid=0x2a,\n"
+        )
+        + "options:\n"
+        "  type=001, len=004: ff:ff:f0:00\n"
+        "  type=003, len=004: 0a:00:00:01\n"
+        "  type=015, len=008: 74:65:73:74:2e:6f:72:67\n"
+        "  type=051, len=004: 00:00:1c:20\n"
+        "  type=053, len=001: 3 (uint8)\n"
+        "  type=058, len=004: 00:00:07:08\n"
+        "  type=059, len=004: 00:00:0e:10"
+    )  # noqa: E501

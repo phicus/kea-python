@@ -45,6 +45,11 @@ PyInit_kea(void) {
         return NULL;
     }
 
+    if (PyModule_AddStringConstant(kea_module, "KEA_VERSION", VERSION) < 0) {
+        Py_DECREF(kea_module);
+        return NULL;
+    }
+
     if (Constants_registerTypes(kea_module) < 0) {
         Py_DECREF(kea_module);
         return NULL;
