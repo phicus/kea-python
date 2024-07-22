@@ -32,9 +32,15 @@ CfgMgr_instance(CfgMgrObject *Py_UNUSED(self), PyObject *Py_UNUSED(args)) {
 
 static PyObject *
 CfgMgr_getDataDir(CfgMgrObject *self, PyObject *Py_UNUSED(args)) {
-    const char *datadir = const_cast<char *>(self->cfg_mgr->getDataDir().get().c_str());
+    const char *datadir = self->cfg_mgr->getDataDir().get().c_str();
 
-    return PyUnicode_FromString(datadir);
+    PyObject *result = PyUnicode_DecodeUTF8(datadir, strlen(datadir), NULL);
+
+    if (result == NULL) {
+        return PyErr_NoMemory();
+    }
+
+    return result;
 }
 
 static PyObject *
@@ -55,7 +61,7 @@ static PyObject *
 CfgMgr_getCurrentCfg(CfgMgrObject *self, PyObject *args) {
     try {
         SrvConfigPtr ptr = self->cfg_mgr->getCurrentCfg();
-        return (SrvConfig_from_ptr(ptr));
+        return SrvConfig_from_ptr(ptr);
     } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return NULL;
@@ -157,4 +163,5 @@ CfgMgr_registerType(PyObject *mod, const char *name) {
 
     return 0;
 }
-}
+
+}  // extern "C"
