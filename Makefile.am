@@ -7,28 +7,28 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = keahook keamodule
 
-KEA_VESION ?= 2.4.1
+KEA_VERSION ?= 2.6.0
 CONTAINER_RUNTIME ?= $(if $(shell command -v podman ;),podman,docker)
 
 .PHONY: build-kea-dev
 build-kea-dev:
-	$(CONTAINER_RUNTIME) build --build-arg KEA_VESION=$(KEA_VESION) -f DockerfileDev --tag kea-dev:$(KEA_VESION) .
+	$(CONTAINER_RUNTIME) build -f containers/kea-python-dev/Dockerfile --build-arg KEA_VERSION=$(KEA_VERSION) --tag kea-dev:$(KEA_VERSION) .
 
 .PHONY: build-kea
 build-kea:
-	$(CONTAINER_RUNTIME) build --build-arg KEA_VESION=$(KEA_VESION) --tag kea:$(KEA_VESION) .
+	$(CONTAINER_RUNTIME) build -f containers/kea-python/Dockerfile --build-arg KEA_VERSION=$(KEA_VERSION) --tag kea:$(KEA_VERSION) .
 
 .PHONY: build-dhtest
 build-dhtest:
-	cd dhtest && $(CONTAINER_RUNTIME) build --tag dhtest .
+	$(CONTAINER_RUNTIME) build -f containers/dhtest/Dockerfile --tag dhtest .
 
 .PHONY: run-kea-dev
 run-kea-dev: kea-network
-	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea-dev kea-dev:$(KEA_VESION) bash
+	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea-dev kea-dev:$(KEA_VERSION) bash
 
 .PHONY: run-kea
 run-kea: kea-network
-	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea kea:$(KEA_VESION) bash
+	$(CONTAINER_RUNTIME) run --rm -it --network kea -e LANG=C.UTF-8 --privileged -v`pwd`:/workdir --name kea kea:$(KEA_VERSION) bash
 
 .PHONY: run-mysql
 run-mysql: kea-network dhcpdb_create.mysql.sql
@@ -48,5 +48,8 @@ kea-network:
 
 .PHONY: dhcpdb_create.mysql.sql
 dhcpdb_create.mysql.sql:
-	tar xz --strip-components 6 -f kea-$(KEA_VESION).tar.gz kea-$(KEA_VESION)/src/share/database/scripts/mysql/dhcpdb_create.mysql
+	tar xz --strip-components 6 -f kea-$(KEA_VERSION).tar.gz kea-$(KEA_VERSION)/src/share/database/scripts/mysql/dhcpdb_create.mysql
 	mv dhcpdb_create.mysql dhcpdb_create.mysql.sql
+
+install-exec-hook:
+	cd $(srcdir)/keamodule && $(MAKE) install
