@@ -218,16 +218,10 @@ HostMgr_from_ptr(HostMgr *mgr) {
 }
 
 static PyObject *
-HostMgr_instance(HostMgrObject *self, PyObject *args) {
+HostMgr_instance(HostMgrObject *Py_UNUSED(self), PyObject *Py_UNUSED(args)) {
     static HostMgrObject *instance = NULL;
 
-    // if (!PyArg_ParseTuple(args, "")) {
-    //     PyErr_SetString(PyExc_TypeError, "HostMgr.instance() takes no arguments");
-    //     return NULL;
-    // }
-
     if (instance == NULL) {
-        // instance = (HostMgrObject *) PyObject_New(HostMgrObject, &HostMgrType);
         instance = (HostMgrObject *)HostMgrType.tp_alloc(&HostMgrType, 0);
         if (instance == NULL) {
             return PyErr_NoMemory();
@@ -267,8 +261,7 @@ static PyMethodDef HostMgr_methods[] = {
     {"del4", (PyCFunction) HostMgr_del4, METH_VARARGS,
      "Attempts to delete a host by (subnet4-id, identifier, identifier-type)."},
     {NULL, NULL, 0, NULL}  // Sentinel
-}; // clang-format off
-
+};  // clang-format on
 static void
 HostMgr_dealloc(HostMgrObject *self) {
     Py_TYPE(self)->tp_free((PyObject *)self);
@@ -285,14 +278,14 @@ HostMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     }
 
     if (instance == NULL) {
-        instance = (HostMgrObject *) HostMgr_instance(instance, args);
+        instance = (HostMgrObject *)HostMgr_instance(instance, args);
     }
 
     Py_INCREF(instance);
-    return (PyObject *) instance;
+    return (PyObject *)instance;
 }
 
-PyTypeObject HostMgrType = { // clang-format off
+PyTypeObject HostMgrType = {  // clang-format off
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "kea.HostMgr",
     .tp_basicsize = sizeof(HostMgrObject),

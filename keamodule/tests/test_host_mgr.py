@@ -8,31 +8,24 @@ def host_mgr():
     return kea.HostMgr.instance()
 
 
-def test_HostMgr_instance_type(host_mgr):
-    """Test to check if the kea.HostMgr.instance() is of type kea.HostMgr."""
-    assert isinstance(host_mgr, kea.HostMgr), "The instance is not of type kea.HostMgr"
-
-
-def test_HostMgr_singleton(host_mgr):
-    """Test to ensure that HostMgr follows singleton pattern."""
-    instance1 = kea.HostMgr()
-    instance2 = kea.HostMgr.instance()
-
-    assert host_mgr is instance1, "HostMgr is not a singleton"
-    assert host_mgr is instance2, "HostMgr.instance() is not a singleton"
-    assert instance1 is instance2, "HostMgr and HostMgr.instance() are not the same"
-
-
-def test_HostMgr_instance(host_mgr):
-    """Test to ensure that instance method returns the same instance."""
-    assert host_mgr is kea.HostMgr.instance(), "Instance method does not return the same instance"
-
-
 @pytest.mark.parametrize(("args", "kwargs"), [((42,), {}), ((), {"foo": 42})])
-def test_HostMgr_new_no_arguments(args, kwargs):
+def test_host_mgr_no_arguments_allowed(args, kwargs):
     """Test to ensure that HostMgr raises TypeError with incorrect arguments."""
     with pytest.raises(TypeError, match=r"takes no arguments"):
         kea.HostMgr(*args, **kwargs)
+
+
+def test_host_mgr_is_singleton():
+    """Test to check if the kea.HostMgr.instance() is of type kea.HostMgr."""
+    instance = kea.HostMgr()
+    assert isinstance(instance, kea.HostMgr), "The instance is not of type kea.HostMgr"
+    assert instance is kea.HostMgr(), "HostMgr is not a singleton"
+
+
+def test_host_mgr_instance_issingleton():
+    """Test to ensure that HostMgr follows singleton pattern."""
+    instance = kea.HostMgr.instance()
+    assert instance is kea.HostMgr.instance(), "HostMgr.instance() is not a singleton"
 
 
 @pytest.mark.parametrize(
@@ -74,14 +67,14 @@ def test_HostMgr_new_no_arguments(args, kwargs):
         ("del4", (1, "foo", 42), {}, r"argument 3 must be str, not int"),
     ],
 )
-def test_HostMgr_method_bad_args(host_mgr, method_name, args, kwargs, error_message):
+def test_host_mgr_method_invalid_args(host_mgr, method_name, args, kwargs, error_message):
     """Test to ensure methods raise TypeError with incorrect arguments."""
     method = getattr(host_mgr, method_name)
     with pytest.raises(TypeError, match=error_message):
         method(*args, **kwargs)
 
 
-def test_HostMgr_add_get_del(host_mgr):
+def test_host_mgr_add_get_del(host_mgr):
     """Test to ensure that add, get, and del methods work as expected."""
     subnet_id = 0
     target = kea.PRIMARY_SOURCE
