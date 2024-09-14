@@ -12,8 +12,7 @@ SrvConfig_toElement(SrvConfigObject *self, PyObject *args) {
     try {
         ElementPtr ptr = self->ptr->toElement();
         return (element_to_object(ptr));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -24,17 +23,16 @@ SrvConfig_getCfgSubnets4(SrvConfigObject *self, PyObject *args) {
     try {
         CfgSubnets4Ptr ptr = self->ptr->getCfgSubnets4();
         return (CfgSubnets4_from_ptr(ptr));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
 }
 
 static PyMethodDef SrvConfig_methods[] = {
-    {"toElement", (PyCFunction) SrvConfig_toElement, METH_NOARGS,
+    {"toElement", (PyCFunction)SrvConfig_toElement, METH_NOARGS,
      "Unparse configuration object."},
-    {"getCfgSubnets4", (PyCFunction) SrvConfig_getCfgSubnets4, METH_NOARGS,
+    {"getCfgSubnets4", (PyCFunction)SrvConfig_getCfgSubnets4, METH_NOARGS,
      "Returns object holding subnets configuration for DHCPv4."},
     {0}  // Sentinel
 };
@@ -45,19 +43,19 @@ SrvConfig_use_count(OptionObject *self, void *closure) {
 }
 
 static PyGetSetDef SrvConfig_getsetters[] = {
-    {(char *)"use_count", (getter) SrvConfig_use_count, (setter) 0, (char *)"shared_ptr use count", 0},
+    {(char *)"use_count", (getter)SrvConfig_use_count, (setter)0, (char *)"shared_ptr use count", 0},
     {0}  // Sentinel
 };
 
 static void
 SrvConfig_dealloc(SrvConfigObject *self) {
     self->ptr.~SrvConfigPtr();
-    Py_TYPE(self)->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int
 SrvConfig_init(SrvConfigObject *self, PyObject *args, PyObject *kwds) {
-    new(&self->ptr) SrvConfigPtr;
+    new (&self->ptr) SrvConfigPtr;
 
     PyErr_SetString(PyExc_RuntimeError, "cannot directly construct");
     return (-1);
@@ -66,75 +64,73 @@ SrvConfig_init(SrvConfigObject *self, PyObject *args, PyObject *kwds) {
 static PyObject *
 SrvConfig_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     SrvConfigObject *self;
-    self = (SrvConfigObject *) type->tp_alloc(type, 0);
+    self = (SrvConfigObject *)type->tp_alloc(type, 0);
     if (self) {
-        new(&self->ptr) SrvConfigPtr;
+        new (&self->ptr) SrvConfigPtr;
     }
-    return ((PyObject *) self);
+    return ((PyObject *)self);
 }
 
 PyTypeObject SrvConfigType = {
-    PyObject_HEAD_INIT(0)
-    "kea.SrvConfig",                            // tp_name
-    sizeof(SrvConfigObject),                    // tp_basicsize
-    0,                                          // tp_itemsize
-    (destructor) SrvConfig_dealloc,             // tp_dealloc
-    0,                                          // tp_vectorcall_offset
-    0,                                          // tp_getattr
-    0,                                          // tp_setattr
-    0,                                          // tp_as_async
-    0,                                          // tp_repr
-    0,                                          // tp_as_number
-    0,                                          // tp_as_sequence
-    0,                                          // tp_as_mapping
-    0,                                          // tp_hash
-    0,                                          // tp_call
-    0,                                          // tp_str
-    0,                                          // tp_getattro
-    0,                                          // tp_setattro
-    0,                                          // tp_as_buffer
-    Py_TPFLAGS_DEFAULT,                         // tp_flags
-    "Kea server SrvConfig",                     // tp_doc
-    0,                                          // tp_traverse
-    0,                                          // tp_clear
-    0,                                          // tp_richcompare
-    0,                                          // tp_weaklistoffset
-    0,                                          // tp_iter
-    0,                                          // tp_iternext
-    SrvConfig_methods,                          // tp_methods
-    0,                                          // tp_members
-    SrvConfig_getsetters,                       // tp_getset
-    0,                                          // tp_base
-    0,                                          // tp_dict
-    0,                                          // tp_descr_get
-    0,                                          // tp_descr_set
-    0,                                          // tp_dictoffset
-    (initproc) SrvConfig_init,                  // tp_init
-    PyType_GenericAlloc,                        // tp_alloc
-    SrvConfig_new                               // tp_new
+    PyObject_HEAD_INIT(0) "kea.SrvConfig",  // tp_name
+    sizeof(SrvConfigObject),                // tp_basicsize
+    0,                                      // tp_itemsize
+    (destructor)SrvConfig_dealloc,          // tp_dealloc
+    0,                                      // tp_vectorcall_offset
+    0,                                      // tp_getattr
+    0,                                      // tp_setattr
+    0,                                      // tp_as_async
+    0,                                      // tp_repr
+    0,                                      // tp_as_number
+    0,                                      // tp_as_sequence
+    0,                                      // tp_as_mapping
+    0,                                      // tp_hash
+    0,                                      // tp_call
+    0,                                      // tp_str
+    0,                                      // tp_getattro
+    0,                                      // tp_setattro
+    0,                                      // tp_as_buffer
+    Py_TPFLAGS_DEFAULT,                     // tp_flags
+    "Kea server SrvConfig",                 // tp_doc
+    0,                                      // tp_traverse
+    0,                                      // tp_clear
+    0,                                      // tp_richcompare
+    0,                                      // tp_weaklistoffset
+    0,                                      // tp_iter
+    0,                                      // tp_iternext
+    SrvConfig_methods,                      // tp_methods
+    0,                                      // tp_members
+    SrvConfig_getsetters,                   // tp_getset
+    0,                                      // tp_base
+    0,                                      // tp_dict
+    0,                                      // tp_descr_get
+    0,                                      // tp_descr_set
+    0,                                      // tp_dictoffset
+    (initproc)SrvConfig_init,               // tp_init
+    PyType_GenericAlloc,                    // tp_alloc
+    SrvConfig_new                           // tp_new
 };
 
 PyObject *
 SrvConfig_from_ptr(SrvConfigPtr &ptr) {
     SrvConfigObject *self = PyObject_New(SrvConfigObject, &SrvConfigType);
     if (self) {
-        new(&self->ptr) SrvConfigPtr;
+        new (&self->ptr) SrvConfigPtr;
         self->ptr = ptr;
     }
     return (PyObject *)self;
 }
 
 int
-SrvConfig_define() {
+SrvConfig_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&SrvConfigType) < 0) {
-        return (1);
+        return -1;
     }
-    if (PyModule_AddObject(kea_module, "SrvConfig", (PyObject *) &SrvConfigType) < 0) {
+    if (PyModule_AddObject(mod, name, (PyObject *)&SrvConfigType) < 0) {
         Py_DECREF(&SrvConfigType);
-        return (1);
+        return -1;
     }
 
-    return (0);
+    return 0;
 }
-
 }

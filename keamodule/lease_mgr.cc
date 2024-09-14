@@ -1,5 +1,6 @@
-#include "keamodule.h"
 #include <dhcpsrv/lease_mgr_factory.h>
+
+#include "keamodule.h"
 
 using namespace std;
 using namespace isc::dhcp;
@@ -21,8 +22,7 @@ lease_list_from_collection(Lease4Collection &leases) {
                 return (0);
             }
         }
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         Py_DECREF(list);
         return (0);
@@ -62,13 +62,11 @@ LeaseMgr_getLease4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
         if (addr != 0 && !hwaddr && !client_id && !have_subnet_id) {
             // Lease4Ptr getLease4(const IOAddress &addr)
             ptr = self->mgr->getLease4(IOAddress(string(addr)));
-        }
-        else if (!addr && hwaddr != 0 && !client_id && have_subnet_id) {
+        } else if (!addr && hwaddr != 0 && !client_id && have_subnet_id) {
             // Lease4Ptr getLease4(const HWAddr &hwaddr, SubnetID subnet_id)
             HWAddr hw = HWAddr::fromText(hwaddr);
             ptr = self->mgr->getLease4(hw, subnet_id);
-        }
-        else if (!addr && !hwaddr && client_id != 0 && have_subnet_id) {
+        } else if (!addr && !hwaddr && client_id != 0 && have_subnet_id) {
             // Lease4Ptr getLease4(const ClientId &clientid, SubnetID subnet_id)
             ClientIdPtr clientid_ptr = ClientId::fromText(client_id);
             ptr = self->mgr->getLease4(*clientid_ptr, subnet_id);
@@ -85,14 +83,12 @@ LeaseMgr_getLease4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
             HWAddr hw = HWAddr::fromText(hwaddr);
             Lease4Collection leases = self->mgr->getLease4(hw);
             return (lease_list_from_collection(leases));
-        }
-        else if (!addr && !hwaddr && client_id != 0 && !have_subnet_id) {
+        } else if (!addr && !hwaddr && client_id != 0 && !have_subnet_id) {
             // Lease4Collection getLease4(const ClientId &clientid)
             ClientIdPtr clientid_ptr = ClientId::fromText(client_id);
             Lease4Collection leases = self->mgr->getLease4(*clientid_ptr);
             return (lease_list_from_collection(leases));
-        }
-        else {
+        } else {
             PyErr_SetString(PyExc_TypeError, "Invalid argument combination");
             return (0);
         }
@@ -100,8 +96,7 @@ LeaseMgr_getLease4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
             Py_RETURN_NONE;
         }
         return (Lease4_from_handle(ptr));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -110,13 +105,13 @@ LeaseMgr_getLease4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
 static PyObject *
 LeaseMgr_getLeases4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
 #if MISSING_GETLEASES4_HOSTNAME
-    #define KWLIST {"subnet_id", "lower_bound_address", "page_size", NULL}
-    #define KWFORMAT "|ksk"
-    #define KWVARS &subnet_id, &lower_bound_address, &page_size
+#define KWLIST {"subnet_id", "lower_bound_address", "page_size", NULL}
+#define KWFORMAT "|ksk"
+#define KWVARS &subnet_id, &lower_bound_address, &page_size
 #else
-    #define KWLIST {"subnet_id", "hostname", "lower_bound_address", "page_size", NULL}
-    #define KWFORMAT "|kssk"
-    #define KWVARS &subnet_id, &hostname, &lower_bound_address, &page_size
+#define KWLIST {"subnet_id", "hostname", "lower_bound_address", "page_size", NULL}
+#define KWFORMAT "|kssk"
+#define KWVARS &subnet_id, &hostname, &lower_bound_address, &page_size
 #endif
     static const char *kwlist[] = KWLIST;
     unsigned long subnet_id = 0;
@@ -146,7 +141,7 @@ LeaseMgr_getLeases4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
         Lease4Collection leases;
         if (have_subnet_id && !hostname && !lower_bound_address && !have_page_size) {
             // Lease4Collection getLeases4(SubnetID subnet_id)
-            leases = self->mgr->getLeases4((SubnetID) subnet_id);
+            leases = self->mgr->getLeases4((SubnetID)subnet_id);
         }
 #ifndef MISSING_GETLEASES4_HOSTNAME
         else if (!have_subnet_id && hostname != 0 && !lower_bound_address && !have_page_size) {
@@ -157,19 +152,16 @@ LeaseMgr_getLeases4(LeaseMgrObject *self, PyObject *args, PyObject *kwargs) {
         else if (!have_subnet_id && !hostname && !lower_bound_address && !have_page_size) {
             // Lease4Collection getLeases4()
             leases = self->mgr->getLeases4();
-        }
-        else if (!have_subnet_id && !hostname && lower_bound_address != 0 && have_page_size) {
+        } else if (!have_subnet_id && !hostname && lower_bound_address != 0 && have_page_size) {
             // Lease4Collection getLeases4(const IOAddress &lower_bound_address, const LeasePageSize &page_size)
             leases = self->mgr->getLeases4(IOAddress(string(lower_bound_address)), LeasePageSize(page_size));
-        }
-        else {
+        } else {
             PyErr_SetString(PyExc_TypeError, "Invalid argument combination");
             return (0);
         }
 
         return (lease_list_from_collection(leases));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -186,8 +178,7 @@ LeaseMgr_addLease(LeaseMgrObject *self, PyObject *args) {
     try {
         self->mgr->addLease(lease->ptr);
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -219,8 +210,7 @@ LeaseMgr_deleteLease(LeaseMgrObject *self, PyObject *args) {
             Py_RETURN_TRUE;
         }
         Py_RETURN_FALSE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -237,8 +227,7 @@ LeaseMgr_updateLease4(LeaseMgrObject *self, PyObject *args) {
     try {
         self->mgr->updateLease4(lease->ptr);
         Py_RETURN_NONE;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -253,34 +242,33 @@ LeaseMgr_wipeLeases4(LeaseMgrObject *self, PyObject *args) {
     }
 
     try {
-        size_t result = self->mgr->wipeLeases4((SubnetID) subnet_id);
+        size_t result = self->mgr->wipeLeases4((SubnetID)subnet_id);
         return (PyLong_FromLong(result));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
 }
 
 static PyMethodDef LeaseMgr_methods[] = {
-    {"getLease4", (PyCFunction) LeaseMgr_getLease4, METH_VARARGS | METH_KEYWORDS,
+    {"getLease4", (PyCFunction)LeaseMgr_getLease4, METH_VARARGS | METH_KEYWORDS,
      "Returns an IPv4 lease for specified IPv4 address."},
-    {"getLeases4", (PyCFunction) LeaseMgr_getLeases4, METH_VARARGS | METH_KEYWORDS,
+    {"getLeases4", (PyCFunction)LeaseMgr_getLeases4, METH_VARARGS | METH_KEYWORDS,
      "Returns all IPv4 leases for the particular subnet identifier."},
-    {"addLease", (PyCFunction) LeaseMgr_addLease, METH_VARARGS,
+    {"addLease", (PyCFunction)LeaseMgr_addLease, METH_VARARGS,
      "Adds an IPv4 lease."},
-    {"deleteLease", (PyCFunction) LeaseMgr_deleteLease, METH_VARARGS,
+    {"deleteLease", (PyCFunction)LeaseMgr_deleteLease, METH_VARARGS,
      "Deletes a lease."},
-    {"updateLease4", (PyCFunction) LeaseMgr_updateLease4, METH_VARARGS,
+    {"updateLease4", (PyCFunction)LeaseMgr_updateLease4, METH_VARARGS,
      "Updates IPv4 lease."},
-    {"wipeLeases4", (PyCFunction) LeaseMgr_wipeLeases4, METH_VARARGS,
+    {"wipeLeases4", (PyCFunction)LeaseMgr_wipeLeases4, METH_VARARGS,
      "Virtual method which removes specified leases."},
     {0}  // Sentinel
 };
 
 static void
 LeaseMgr_dealloc(LeaseMgrObject *self) {
-    Py_TYPE(self)->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int
@@ -295,8 +283,7 @@ LeaseMgr_init(LeaseMgrObject *self, PyObject *args, PyObject *kwds) {
 
     try {
         self->mgr = &LeaseMgrFactory::instance();
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (-1);
     }
@@ -307,66 +294,64 @@ LeaseMgr_init(LeaseMgrObject *self, PyObject *args, PyObject *kwds) {
 static PyObject *
 LeaseMgr_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     LeaseMgrObject *self;
-    self = (LeaseMgrObject *) type->tp_alloc(type, 0);
+    self = (LeaseMgrObject *)type->tp_alloc(type, 0);
     if (self) {
         self->mgr = 0;
     }
-    return ((PyObject *) self);
+    return ((PyObject *)self);
 }
 
 PyTypeObject LeaseMgrType = {
-    PyObject_HEAD_INIT(0)
-    "kea.LeaseMgr",                             // tp_name
-    sizeof(LeaseMgrObject),                     // tp_basicsize
-    0,                                          // tp_itemsize
-    (destructor) LeaseMgr_dealloc,              // tp_dealloc
-    0,                                          // tp_vectorcall_offset
-    0,                                          // tp_getattr
-    0,                                          // tp_setattr
-    0,                                          // tp_as_async
-    0,                                          // tp_repr
-    0,                                          // tp_as_number
-    0,                                          // tp_as_sequence
-    0,                                          // tp_as_mapping
-    0,                                          // tp_hash
-    0,                                          // tp_call
-    0,                                          // tp_str
-    0,                                          // tp_getattro
-    0,                                          // tp_setattro
-    0,                                          // tp_as_buffer
-    Py_TPFLAGS_DEFAULT,                         // tp_flags
-    "Kea server LeaseMgr",                      // tp_doc
-    0,                                          // tp_traverse
-    0,                                          // tp_clear
-    0,                                          // tp_richcompare
-    0,                                          // tp_weaklistoffset
-    0,                                          // tp_iter
-    0,                                          // tp_iternext
-    LeaseMgr_methods,                           // tp_methods
-    0,                                          // tp_members
-    0,                                          // tp_getset
-    0,                                          // tp_base
-    0,                                          // tp_dict
-    0,                                          // tp_descr_get
-    0,                                          // tp_descr_set
-    0,                                          // tp_dictoffset
-    (initproc) LeaseMgr_init,                   // tp_init
-    PyType_GenericAlloc,                        // tp_alloc
-    LeaseMgr_new                                // tp_new
+    PyObject_HEAD_INIT(0) "kea.LeaseMgr",  // tp_name
+    sizeof(LeaseMgrObject),                // tp_basicsize
+    0,                                     // tp_itemsize
+    (destructor)LeaseMgr_dealloc,          // tp_dealloc
+    0,                                     // tp_vectorcall_offset
+    0,                                     // tp_getattr
+    0,                                     // tp_setattr
+    0,                                     // tp_as_async
+    0,                                     // tp_repr
+    0,                                     // tp_as_number
+    0,                                     // tp_as_sequence
+    0,                                     // tp_as_mapping
+    0,                                     // tp_hash
+    0,                                     // tp_call
+    0,                                     // tp_str
+    0,                                     // tp_getattro
+    0,                                     // tp_setattro
+    0,                                     // tp_as_buffer
+    Py_TPFLAGS_DEFAULT,                    // tp_flags
+    "Kea server LeaseMgr",                 // tp_doc
+    0,                                     // tp_traverse
+    0,                                     // tp_clear
+    0,                                     // tp_richcompare
+    0,                                     // tp_weaklistoffset
+    0,                                     // tp_iter
+    0,                                     // tp_iternext
+    LeaseMgr_methods,                      // tp_methods
+    0,                                     // tp_members
+    0,                                     // tp_getset
+    0,                                     // tp_base
+    0,                                     // tp_dict
+    0,                                     // tp_descr_get
+    0,                                     // tp_descr_set
+    0,                                     // tp_dictoffset
+    (initproc)LeaseMgr_init,               // tp_init
+    PyType_GenericAlloc,                   // tp_alloc
+    LeaseMgr_new                           // tp_new
 };
 
 int
-LeaseMgr_define() {
+LeaseMgr_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&LeaseMgrType) < 0) {
-        return (1);
+        return -1;
     }
     Py_INCREF(&LeaseMgrType);
-    if (PyModule_AddObject(kea_module, "LeaseMgr", (PyObject *) &LeaseMgrType) < 0) {
+    if (PyModule_AddObject(mod, name, (PyObject *)&LeaseMgrType) < 0) {
         Py_DECREF(&LeaseMgrType);
-        return (1);
+        return -1;
     }
 
-    return (0);
+    return 0;
 }
-
 }

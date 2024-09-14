@@ -2,6 +2,8 @@ import os
 import re
 from setuptools import setup, Extension
 
+version = "@PACKAGE_VERSION@"
+
 def transform_includes_to_list(include_string):
     return [e.replace('-I', '', 1) for e in include_string.split() if e.startswith('-I')]
 
@@ -43,9 +45,10 @@ kea = Extension('kea',
                 'kea-hooks',
                 'kea-dhcpsrv',
                 'ffi'],
+    define_macros=[('MODULE_VERSION', f'"{version}"')],
     extra_compile_args=['-std=c++11'])
 
 setup(name='kea',
-      version='@PACKAGE_VERSION@',
+      version=version,
       description='Extension module for Kea',
       ext_modules=[kea])
