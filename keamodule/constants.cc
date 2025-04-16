@@ -11,7 +11,8 @@ typedef struct {
     int value;
 } KeaConstant;
 
-#define constant(name) {#name, name}
+#define constant(name) \
+    {#name, name}
 
 static KeaConstant constants[] = {
     constant(BOOTREQUEST),
@@ -200,13 +201,12 @@ static KeaConstant constants[] = {
 #define num_constants (sizeof(constants) / sizeof(constants[0]))
 
 int
-Constants_define() {
+Constants_registerTypes(PyObject *mod) {
     for (unsigned int i = 0; i < num_constants; i++) {
-        if (PyModule_AddIntConstant(kea_module, constants[i].name, constants[i].value) < 0) {
-            return (1);
+        if (PyModule_AddIntConstant(mod, constants[i].name, constants[i].value) < 0) {
+            return -1;
         }
     }
-    return (0);
+    return 0;
 }
-
 }

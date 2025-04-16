@@ -21,7 +21,7 @@ static PyObject *
 Option_getBytes(OptionObject *self, PyObject *args) {
     try {
         vector<uint8_t> value = self->ptr->toBinary();
-        return (PyBytes_FromStringAndSize((const char *) &value[0], value.size()));
+        return (PyBytes_FromStringAndSize((const char *)&value[0], value.size()));
     } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
@@ -54,7 +54,7 @@ static PyObject *
 Option_getString(OptionObject *self, PyObject *args) {
     try {
         vector<uint8_t> value = self->ptr->toBinary();
-        return (PyUnicode_FromStringAndSize((const char *) &value[0], value.size()));
+        return (PyUnicode_FromStringAndSize((const char *)&value[0], value.size()));
     } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
@@ -208,8 +208,7 @@ Option_pack(OptionObject *self, PyObject *args) {
         OutputBuffer buf(64);
         self->ptr->pack(buf);
         return (PyBytes_FromStringAndSize((char *)buf.getData(), buf.getLength()));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -220,43 +219,42 @@ Option_toText(OptionObject *self, PyObject *args) {
     try {
         string addr = self->ptr->toText();
         return (PyUnicode_FromString(addr.c_str()));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
 }
 
 static PyMethodDef Option_methods[] = {
-    {"getType", (PyCFunction) Option_getType, METH_NOARGS,
+    {"getType", (PyCFunction)Option_getType, METH_NOARGS,
      "Returns option type."},
-    {"getBytes", (PyCFunction) Option_getBytes, METH_NOARGS,
+    {"getBytes", (PyCFunction)Option_getBytes, METH_NOARGS,
      "Returns option data."},
-    {"setBytes", (PyCFunction) Option_setBytes, METH_VARARGS,
+    {"setBytes", (PyCFunction)Option_setBytes, METH_VARARGS,
      "Sets content to data."},
-    {"getString", (PyCFunction) Option_getString, METH_NOARGS,
+    {"getString", (PyCFunction)Option_getString, METH_NOARGS,
      "Returns option data from UTF-8 decoded string."},
-    {"setString", (PyCFunction) Option_setString, METH_VARARGS,
+    {"setString", (PyCFunction)Option_setString, METH_VARARGS,
      "Sets content to UTF-8 encoded string."},
-    {"getUint8", (PyCFunction) Option_getUint8, METH_NOARGS,
+    {"getUint8", (PyCFunction)Option_getUint8, METH_NOARGS,
      "Returns content of first byte."},
-    {"setUint8", (PyCFunction) Option_setUint8, METH_VARARGS,
+    {"setUint8", (PyCFunction)Option_setUint8, METH_VARARGS,
      "Sets content to single uint8 value."},
-    {"getUint16", (PyCFunction) Option_getUint16, METH_NOARGS,
+    {"getUint16", (PyCFunction)Option_getUint16, METH_NOARGS,
      "Returns content of first word."},
-    {"setUint16", (PyCFunction) Option_setUint16, METH_VARARGS,
+    {"setUint16", (PyCFunction)Option_setUint16, METH_VARARGS,
      "Sets content to single uint16 value."},
-    {"getUint32", (PyCFunction) Option_getUint32, METH_NOARGS,
+    {"getUint32", (PyCFunction)Option_getUint32, METH_NOARGS,
      "Returns content of first double word."},
-    {"setUint32", (PyCFunction) Option_setUint32, METH_VARARGS,
+    {"setUint32", (PyCFunction)Option_setUint32, METH_VARARGS,
      "Sets content to single uint32 value."},
-    {"addOption", (PyCFunction) Option_addOption, METH_VARARGS,
+    {"addOption", (PyCFunction)Option_addOption, METH_VARARGS,
      "Adds a sub-option."},
-    {"getOption", (PyCFunction) Option_getOption, METH_VARARGS,
+    {"getOption", (PyCFunction)Option_getOption, METH_VARARGS,
      "Returns suboption of specific type."},
-    {"pack", (PyCFunction) Option_pack, METH_NOARGS,
+    {"pack", (PyCFunction)Option_pack, METH_NOARGS,
      "Return option in wire-format."},
-    {"toText", (PyCFunction) Option_toText, METH_NOARGS,
+    {"toText", (PyCFunction)Option_toText, METH_NOARGS,
      "Returns string representation of the option."},
     {0}  // Sentinel
 };
@@ -267,21 +265,21 @@ Option_use_count(OptionObject *self, void *closure) {
 }
 
 static PyGetSetDef Option_getsetters[] = {
-    {(char *)"use_count", (getter) Option_use_count, (setter) 0, (char *)"shared_ptr use count", 0},
+    {(char *)"use_count", (getter)Option_use_count, (setter)0, (char *)"shared_ptr use count", 0},
     {0}  // Sentinel
 };
 
 static void
 Option_dealloc(OptionObject *self) {
     self->ptr.~OptionPtr();
-    Py_TYPE(self)->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int
 Option_init(OptionObject *self, PyObject *args, PyObject *kwds) {
     unsigned short type;
 
-    new(&self->ptr) OptionPtr;
+    new (&self->ptr) OptionPtr;
 
     if (kwds != 0) {
         PyErr_SetString(PyExc_TypeError, "keyword arguments are not supported");
@@ -298,76 +296,74 @@ Option_init(OptionObject *self, PyObject *args, PyObject *kwds) {
 static PyObject *
 Option_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     OptionObject *self;
-    self = (OptionObject *) type->tp_alloc(type, 0);
+    self = (OptionObject *)type->tp_alloc(type, 0);
     if (self) {
-        new(&self->ptr) OptionPtr;
+        new (&self->ptr) OptionPtr;
     }
-    return ((PyObject *) self);
+    return ((PyObject *)self);
 }
 
 PyTypeObject OptionType = {
-    PyObject_HEAD_INIT(0)
-    "kea.Option",                               // tp_name
-    sizeof(OptionObject),                       // tp_basicsize
-    0,                                          // tp_itemsize
-    (destructor) Option_dealloc,                // tp_dealloc
-    0,                                          // tp_vectorcall_offset
-    0,                                          // tp_getattr
-    0,                                          // tp_setattr
-    0,                                          // tp_as_async
-    0,                                          // tp_repr
-    0,                                          // tp_as_number
-    0,                                          // tp_as_sequence
-    0,                                          // tp_as_mapping
-    0,                                          // tp_hash
-    0,                                          // tp_call
-    0,                                          // tp_str
-    0,                                          // tp_getattro
-    0,                                          // tp_setattro
-    0,                                          // tp_as_buffer
-    Py_TPFLAGS_DEFAULT,                         // tp_flags
-    "Kea server Option",                        // tp_doc
-    0,                                          // tp_traverse
-    0,                                          // tp_clear
-    0,                                          // tp_richcompare
-    0,                                          // tp_weaklistoffset
-    0,                                          // tp_iter
-    0,                                          // tp_iternext
-    Option_methods,                             // tp_methods
-    0,                                          // tp_members
-    Option_getsetters,                          // tp_getset
-    0,                                          // tp_base
-    0,                                          // tp_dict
-    0,                                          // tp_descr_get
-    0,                                          // tp_descr_set
-    0,                                          // tp_dictoffset
-    (initproc) Option_init,                     // tp_init
-    PyType_GenericAlloc,                        // tp_alloc
-    Option_new                                  // tp_new
+    PyObject_HEAD_INIT(0) "kea.Option",  // tp_name
+    sizeof(OptionObject),                // tp_basicsize
+    0,                                   // tp_itemsize
+    (destructor)Option_dealloc,          // tp_dealloc
+    0,                                   // tp_vectorcall_offset
+    0,                                   // tp_getattr
+    0,                                   // tp_setattr
+    0,                                   // tp_as_async
+    0,                                   // tp_repr
+    0,                                   // tp_as_number
+    0,                                   // tp_as_sequence
+    0,                                   // tp_as_mapping
+    0,                                   // tp_hash
+    0,                                   // tp_call
+    0,                                   // tp_str
+    0,                                   // tp_getattro
+    0,                                   // tp_setattro
+    0,                                   // tp_as_buffer
+    Py_TPFLAGS_DEFAULT,                  // tp_flags
+    "Kea server Option",                 // tp_doc
+    0,                                   // tp_traverse
+    0,                                   // tp_clear
+    0,                                   // tp_richcompare
+    0,                                   // tp_weaklistoffset
+    0,                                   // tp_iter
+    0,                                   // tp_iternext
+    Option_methods,                      // tp_methods
+    0,                                   // tp_members
+    Option_getsetters,                   // tp_getset
+    0,                                   // tp_base
+    0,                                   // tp_dict
+    0,                                   // tp_descr_get
+    0,                                   // tp_descr_set
+    0,                                   // tp_dictoffset
+    (initproc)Option_init,               // tp_init
+    PyType_GenericAlloc,                 // tp_alloc
+    Option_new                           // tp_new
 };
 
 PyObject *
 Option_from_handle(OptionPtr &ptr) {
     OptionObject *self = PyObject_New(OptionObject, &OptionType);
     if (self) {
-        new(&self->ptr) OptionPtr;
+        new (&self->ptr) OptionPtr;
         self->ptr = ptr;
     }
     return (PyObject *)self;
 }
 
 int
-Option_define() {
+Option_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&OptionType) < 0) {
-        return (1);
+        return -1;
     }
     Py_INCREF(&OptionType);
-    if (PyModule_AddObject(kea_module, "Option", (PyObject *) &OptionType) < 0) {
+    if (PyModule_AddObject(mod, name, (PyObject *)&OptionType) < 0) {
         Py_DECREF(&OptionType);
-        return (1);
+        return -1;
     }
 
-    return (0);
+    return 0;
 }
-
 }

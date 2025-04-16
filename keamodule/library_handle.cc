@@ -1,4 +1,5 @@
 #include <ffi.h>
+
 #include "keamodule.h"
 
 using namespace std;
@@ -23,7 +24,7 @@ LibraryHandle_registerCommandCallout(LibraryHandleObject *self, PyObject *args) 
         return (0);
     }
 
-    CalloutClosureObject *obj = (CalloutClosureObject *) CalloutClosure_from_object(name, callout);
+    CalloutClosureObject *obj = (CalloutClosureObject *)CalloutClosure_from_object(name, callout);
     if (!obj) {
         return (0);
     }
@@ -35,8 +36,7 @@ LibraryHandle_registerCommandCallout(LibraryHandleObject *self, PyObject *args) 
     Py_DECREF(obj);
     try {
         self->handle->registerCommandCallout(PyUnicode_AsUTF8(name), (CalloutPtr)obj->bound_callout);
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (0);
     }
@@ -45,7 +45,7 @@ LibraryHandle_registerCommandCallout(LibraryHandleObject *self, PyObject *args) 
 }
 
 static PyMethodDef LibraryHandle_methods[] = {
-    {"registerCommandCallout", (PyCFunction) LibraryHandle_registerCommandCallout, METH_VARARGS,
+    {"registerCommandCallout", (PyCFunction)LibraryHandle_registerCommandCallout, METH_VARARGS,
      "Register control command handler."},
     {0}  // Sentinel
 };
@@ -55,7 +55,7 @@ LibraryHandle_dealloc(LibraryHandleObject *self) {
     if (self->is_owner) {
         delete self->handle;
     }
-    Py_TYPE(self)->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static int
@@ -77,8 +77,7 @@ LibraryHandle_init(LibraryHandleObject *self, PyObject *args, PyObject *kwds) {
         self->handle = new LibraryHandle(*manager->manager);
 #endif
         self->is_owner = true;
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         PyErr_SetString(PyExc_TypeError, e.what());
         return (-1);
     }
@@ -89,20 +88,19 @@ LibraryHandle_init(LibraryHandleObject *self, PyObject *args, PyObject *kwds) {
 static PyObject *
 LibraryHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     LibraryHandleObject *self;
-    self = (LibraryHandleObject *) type->tp_alloc(type, 0);
+    self = (LibraryHandleObject *)type->tp_alloc(type, 0);
     if (self) {
         self->handle = 0;
         self->is_owner = false;
     }
-    return ((PyObject *) self);
+    return ((PyObject *)self);
 }
 
 PyTypeObject LibraryHandleType = {
-    PyObject_HEAD_INIT(0)
-    "kea.LibraryHandle",                        // tp_name
+    PyObject_HEAD_INIT(0) "kea.LibraryHandle",  // tp_name
     sizeof(LibraryHandleObject),                // tp_basicsize
     0,                                          // tp_itemsize
-    (destructor) LibraryHandle_dealloc,         // tp_dealloc
+    (destructor)LibraryHandle_dealloc,          // tp_dealloc
     0,                                          // tp_vectorcall_offset
     0,                                          // tp_getattr
     0,                                          // tp_setattr
@@ -133,7 +131,7 @@ PyTypeObject LibraryHandleType = {
     0,                                          // tp_descr_get
     0,                                          // tp_descr_set
     0,                                          // tp_dictoffset
-    (initproc) LibraryHandle_init,              // tp_init
+    (initproc)LibraryHandle_init,               // tp_init
     PyType_GenericAlloc,                        // tp_alloc
     LibraryHandle_new                           // tp_new
 };
@@ -149,17 +147,16 @@ LibraryHandle_from_handle(LibraryHandle *handle) {
 }
 
 int
-LibraryHandle_define() {
+LibraryHandle_registerType(PyObject *mod, const char *name) {
     if (PyType_Ready(&LibraryHandleType) < 0) {
-        return (1);
+        return -1;
     }
     Py_INCREF(&LibraryHandleType);
-    if (PyModule_AddObject(kea_module, "LibraryHandle", (PyObject *) &LibraryHandleType) < 0) {
+    if (PyModule_AddObject(mod, name, (PyObject *)&LibraryHandleType) < 0) {
         Py_DECREF(&LibraryHandleType);
-        return (1);
+        return -1;
     }
 
-    return (0);
+    return 0;
 }
-
 }
