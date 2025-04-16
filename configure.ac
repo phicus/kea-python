@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(kea_python, 1.2)
+AC_INIT([kea-python], [1.2.0], [jgomez@phicus.es], [kea-python])
 
 AM_INIT_AUTOMAKE(foreign)
 
